@@ -5,7 +5,7 @@ import { Card, CardBody, CardHeader } from 'reactstrap';
 import { FaPencil, FaTimesCircle } from 'react-icons/lib/fa';
 import colors from '@/styles/colors';
 import IconButton from '@/components/IconButton';
-import Dependencies from '@/components/Dependencies';
+import Interrelations from '@/components/Interrelations';
 import Deliberations from '@/components/Deliberations';
 import EditDetailsContainer from './components/EditDetailsContainer';
 import DeleteNodeContainer from './components/DeleteNodeContainer';
@@ -44,13 +44,15 @@ const DetailView = ({
 }) => (
   <Card>
     <DetailViewCardHeader
-      color={node.__typename === 'Responsibility' ? colors.responsibility : colors.need}
+      color={
+        node.__typename === 'Responsibility'
+          ? colors.responsibility
+          : colors.tag
+      }
     >
-      <HeaderText>
-        {node.__typename}
-      </HeaderText>
-      {isLoggedIn && (
-        showEdit ? (
+      <HeaderText>Update {/* {node.__typename} */}</HeaderText>
+      {isLoggedIn &&
+        (showEdit ? (
           <HeaderButton onClick={onClickCancel}>
             <FaTimesCircle />
           </HeaderButton>
@@ -58,8 +60,7 @@ const DetailView = ({
           <HeaderButton onClick={onClickEdit}>
             <FaPencil />
           </HeaderButton>
-        )
-      )}
+        ))}
     </DetailViewCardHeader>
     {showEdit ? (
       <CardBody>
@@ -71,20 +72,22 @@ const DetailView = ({
           nodeId={node.nodeId}
           deliberations={node.deliberations}
         />
-        <Dependencies
+        <Interrelations
           showAddRemove
           nodeType={node.__typename}
           nodeId={node.nodeId}
-          dependencies={[
-            ...(node.dependsOnNeeds || []),
-            ...(node.dependsOnResponsibilities || []),
+          interrelations={[
+            ...(node.relatesToTags || []),
+            ...(node.relatesToResponsibilities || []),
           ]}
         />
         <Divider />
         <DeleteNodeContainer nodeType={node.__typename} nodeId={node.nodeId} />
       </CardBody>
     ) : (
-      <DetailViewBody node={node} />
+      <div>
+        <DetailViewBody node={node} />
+      </div>
     )}
   </Card>
 );
@@ -110,12 +113,12 @@ DetailView.propTypes = {
       email: PropTypes.string,
       name: PropTypes.string,
     }),
-    dependsOnNeeds: PropTypes.arrayOf(PropTypes.shape({
+    relatesToTags: PropTypes.arrayOf(PropTypes.shape({
       __typename: PropTypes.string,
       nodeId: PropTypes.string,
       title: PropTypes.string,
     })),
-    dependsOnResponsibilities: PropTypes.arrayOf(PropTypes.shape({
+    relatesToResponsibilities: PropTypes.arrayOf(PropTypes.shape({
       __typename: PropTypes.string,
       nodeId: PropTypes.string,
       title: PropTypes.string,
@@ -146,8 +149,8 @@ DetailView.defaultProps = {
       email: '',
       name: '',
     },
-    dependsOnNeeds: [],
-    dependsOnResponsibilities: [],
+    relatesToTags: [],
+    relatesToResponsibilities: [],
   },
   showEdit: false,
   isLoggedIn: false,

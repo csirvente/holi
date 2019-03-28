@@ -2,9 +2,9 @@
 
 import gql from 'graphql-tag';
 
-export const GET_NEEDS = gql`
-  query Needs {
-    needs {
+export const GET_TAGS = gql`
+  query Tags {
+    tags {
       nodeId
       title
       fulfilledBy {
@@ -20,8 +20,8 @@ export const GET_NEEDS = gql`
 `;
 
 export const GET_RESPONSIBILITIES = gql`
-  query Responsibilities($needId: ID!) {
-    responsibilities(fulfillsNeedId: $needId) {
+  query Responsibilities($tagId: ID!) {
+    responsibilities(fulfillsTagId: $tagId) {
       nodeId
       title
       realizer {

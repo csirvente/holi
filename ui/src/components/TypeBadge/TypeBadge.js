@@ -21,7 +21,7 @@ TypeBadge.propTypes = {
 };
 
 TypeBadge.defaultProps = {
-  nodeType: 'Need',
+  nodeType: 'Tag',
 };
 
 export default TypeBadge;

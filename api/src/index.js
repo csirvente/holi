@@ -10,7 +10,6 @@ import jwksRsa from 'jwks-rsa';
 import neo4jDriver from './db/neo4jDriver';
 
 import schema from './graphql/schema';
-import startSchedulers from './services/scheduler';
 
 // Max listeners for a pub/sub
 require('events').EventEmitter.defaultMaxListeners = 15;
@@ -27,7 +26,7 @@ const jwksOptions = {
   cache: true,
   rateLimit: true,
   jwksRequestsPerMinute: 5,
-  jwksUri: 'https://theborderland.eu.auth0.com/.well-known/jwks.json',
+  jwksUri: 'https://holi.eu.auth0.com/.well-known/jwks.json',
 };
 
 const jwksClient = jwksRsa(jwksOptions);
@@ -45,8 +44,8 @@ function getUser(user) {
     {},
     user,
     {
-      email: user['https://realities.theborderland.se/email'],
-      role: user['https://realities.theborderland.se/role'],
+      email: user['https://holi.app/email'],
+      role: user['https://holi.app/role'],
     },
   );
 }
@@ -104,5 +103,3 @@ httpServer.listen(API_PORT, () => {
   console.log(`View GraphQL Playground at http://localhost:${API_PORT}/graphql`);
 });
 
-// Start the schedulers that download data from various APIs.
-startSchedulers();

@@ -20,7 +20,7 @@ const RoutesContainer = () => (
         <Route exact path="/about" component={About} />
         <Route exact path="/profile" component={Profile} />
         <Route exact path="/profile/:personId" component={UserProfile} />
-        <Route path="/:needId?/:responsibilityId?" component={Home} />
+        <Route path="/:tagId?/:responsibilityId?" component={Home} />
       </Switch>
       <RealitiesFooter />
     </div>

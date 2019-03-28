@@ -19,7 +19,7 @@ function fireHandlers() {
 
 export default {
   login: () => {
-    auth0.authorize({ title: 'Realities' });
+    auth0.authorize({ title: 'Holi', prompt: 'login' });
   },
   handleAuthentication: () => (
     new Promise((resolve, reject) => {

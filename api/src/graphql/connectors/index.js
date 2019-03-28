@@ -121,40 +121,40 @@ export function findNodeByRelationshipAndLabel(
   return runQueryAndGetRecord(driver.session(), query, { nodeId: originNodeId });
 }
 
-export function createNeed(driver, { title }, userEmail) {
+export function createTag(driver, { title }, userEmail) {
   const queryParams = {
     title,
     email: userEmail,
-    needId: uuidv4(),
+    tagId: uuidv4(),
   };
   // Use cypher FOREACH hack to only set nodeId for person if it isn't already set
   const query = `
     MATCH (person:Person {email:{email}})
-    CREATE (need:Need {title:{title}, nodeId:{needId}, created:timestamp()})
-    CREATE (person)-[:GUIDES]->(need)
-    CREATE (person)-[:REALIZES]->(need)
-    RETURN need
+    CREATE (tag:Tag {title:{title}, nodeId:{tagId}, created:timestamp()})
+    CREATE (person)-[:GUIDES]->(tag)
+    CREATE (person)-[:REALIZES]->(tag)
+    RETURN tag
   `;
   return runQueryAndGetRecord(driver.session(), query, queryParams);
 }
 
-export function createResponsibility(driver, { title, needId }, userEmail) {
+export function createResponsibility(driver, { title, tagId }, userEmail) {
   const queryParams = {
     title,
-    needId,
+    tagId,
     email: userEmail,
     responsibilityId: uuidv4(),
   };
   // Use cypher FOREACH hack to only set nodeId for person if it isn't already set
   const query = `
-    MATCH (need:Need {nodeId: {needId}})
-    WITH need
+    MATCH (tag:Tag {nodeId: {tagId}})
+    WITH tag
     MATCH (person:Person {email:{email}})
     CREATE (resp:Responsibility {
       title:{title},
       nodeId:{responsibilityId},
       created:timestamp()
-    })-[r:FULFILLS]->(need)
+    })-[r:FULFILLS]->(tag)
     CREATE (person)-[:GUIDES]->(resp)
     RETURN resp
   `;
@@ -262,7 +262,7 @@ export function softDeleteNode(driver, { nodeId }) {
   return runQueryAndGetRecord(driver.session(), query, { nodeId });
 }
 
-export function addDependency(driver, { from, to }) {
+export function addInterrelation(driver, { from, to }) {
   const queryParams = {
     fromId: from.nodeId,
     toId: to.nodeId,
@@ -270,19 +270,19 @@ export function addDependency(driver, { from, to }) {
   const query = `
     MATCH (from {nodeId: {fromId}})
     MATCH (to {nodeId: {toId}})
-    MERGE (from)-[:DEPENDS_ON]->(to)
+    MERGE (from)-[:RELATES_TO]->(to)
     RETURN from, to
   `;
   return runQueryAndGetRecordWithFields(driver.session(), query, queryParams);
 }
 
-export function removeDependency(driver, { from, to }) {
+export function removeInterrelation(driver, { from, to }) {
   const queryParams = {
     fromId: from.nodeId,
     toId: to.nodeId,
   };
   const query = `
-    MATCH (from {nodeId: {fromId}})-[r:DEPENDS_ON]->(to {nodeId: {toId}})
+    MATCH (from {nodeId: {fromId}})-[r:RELATES_TO]->(to {nodeId: {toId}})
     DELETE r
     RETURN from, to
   `;
@@ -337,14 +337,14 @@ export function getEmailData(driver, { nodeId }) {
     MATCH (n {nodeId:'${nodeId}'})
     MATCH (n)<-[:GUIDES*0..1]-(gu:Person)
     OPTIONAL MATCH (re:Person)-[:REALIZES*0..1]->(n)
-    OPTIONAL MATCH (n)-[:FULFILLS]->(need)
+    OPTIONAL MATCH (n)-[:FULFILLS]->(tag)
     RETURN 
     labels(n) as reality_labels,
     n.description as description, 
     n.title as title, 
     gu.email as guideEmail,
     re.email as realizerEmail,
-    need.nodeId as linkedNeedId
+    tag.nodeId as linkedTagId
   `;
   return runQueryAndGetRawData(driver.session(), query, { nodeId });
 }

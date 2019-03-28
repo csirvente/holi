@@ -34,7 +34,7 @@ const RemoveDeliberation = withRouter(({ match, url }) => (
           e.stopPropagation();
           removeDeliberation({
             variables: {
-              from: { nodeId: match.params.responsibilityId || match.params.needId },
+              from: { nodeId: match.params.responsibilityId || match.params.tagId },
               to: { url },
             },
           });
@@ -49,7 +49,7 @@ const RemoveDeliberation = withRouter(({ match, url }) => (
 RemoveDeliberation.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({
-      needId: PropTypes.string,
+      tagId: PropTypes.string,
       responsibilityId: PropTypes.string,
     }),
   }),
@@ -60,7 +60,7 @@ RemoveDeliberation.propTypes = {
 RemoveDeliberation.defaultProps = {
   match: {
     params: {
-      needId: undefined,
+      tagId: undefined,
       responsibilityId: undefined,
     },
   },

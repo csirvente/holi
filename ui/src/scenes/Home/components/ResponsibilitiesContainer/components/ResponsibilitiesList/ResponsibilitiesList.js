@@ -51,7 +51,7 @@ class ResponsibilitiesList extends Component {
               href="#"
               action
               active={responsibility.nodeId === selectedResponsibilityId}
-              onClick={() => history.push(`/${match.params.needId}/${responsibility.nodeId}`)}
+              onClick={() => history.push(`/${match.params.tagId}/${responsibility.nodeId}`)}
             >
               {responsibility.title}
               {renderMissingRealizerIcon(responsibility)}
@@ -75,7 +75,7 @@ ResponsibilitiesList.propTypes = {
   }),
   match: PropTypes.shape({
     params: PropTypes.shape({
-      needId: PropTypes.string,
+      tagId: PropTypes.string,
     }),
   }),
 };
@@ -88,7 +88,7 @@ ResponsibilitiesList.defaultProps = {
   },
   match: {
     params: {
-      needId: undefined,
+      tagId: undefined,
     },
   },
 };

@@ -12,20 +12,20 @@ If you want to chat to other members of the community and collaborate in real-ti
 
 ## Dependencies
 
-  * nodejs 8.9.x
-  * npm 5.5.x
-  * neo4j
-  * neo4j [apoc](https://neo4j-contrib.github.io/neo4j-apoc-procedures/) 
-  
+- nodejs 8.9.x
+- npm 5.5.x
+- neo4j
+- neo4j [apoc](https://neo4j-contrib.github.io/neo4j-apoc-procedures/)
+
 ## How to contribute
 
 ### Maintain consistency and follow conventions
 
-As the codebase grows, it's important that everyone contributing to it follow the same conventions. Keeping a codebase consistent and easy to work with is hard and requires diligence. Take some time to understand the way the codebase is organized before you make your first commit. If you have suggestions as to how structure or conventions can be improved, bring it up with the community so that we can make improvements throughout the whole codebase and maintain consistency. 
+As the codebase grows, it's important that everyone contributing to it follow the same conventions. Keeping a codebase consistent and easy to work with is hard and requires diligence. Take some time to understand the way the codebase is organized before you make your first commit. If you have suggestions as to how structure or conventions can be improved, bring it up with the community so that we can make improvements throughout the whole codebase and maintain consistency.
 
 ### Linting
 
-We use ESLint with the [Airbnb config](https://github.com/airbnb/javascript) for code formatting. Before you commit, make sure you've fixed all linting errors and warnings. Don't turn off the linting rule that is giving you problems unless you really, really, really know what you're doing. 
+We use ESLint with the [Airbnb config](https://github.com/airbnb/javascript) for code formatting. Before you commit, make sure you've fixed all linting errors and warnings. Don't turn off the linting rule that is giving you problems unless you really, really, really know what you're doing.
 
 ### Work in feature branches
 
@@ -47,7 +47,7 @@ We use various libraries on the back-end to set up our GraphQL API. On the front
 
 ### Authentication with Auth0
 
-We use [Auth0](https://auth0.com/) for Authentication and Authorization. When a user signs up or logs in on the front-end, they are taken through a flow where Auth0 creates a [Jason Web Token (JWT)](https://jwt.io/) that is returned to the front-end and stored in the browser's localStorage. We've created [rules in Auth0](https://auth0.com/docs/rules/current) that add the user's email and role (whether they are a Reality Admin or a normal user) securely to the JWT. The front-end sends the JWT to the back-end with every API call in an http header. The back-end validates the JWT, fetches the user's email and role from it and can then determine whether the user has permission to do whatever they are trying to do. 
+We use [Auth0](https://auth0.com/) for Authentication and Authorization. When a user signs up or logs in on the front-end, they are taken through a flow where Auth0 creates a [Jason Web Token (JWT)](https://jwt.io/) that is returned to the front-end and stored in the browser's localStorage. We've created [rules in Auth0](https://auth0.com/docs/rules/current) that add the user's email and role (whether they are a Reality Admin or a normal user) securely to the JWT. The front-end sends the JWT to the back-end with every API call in an http header. The back-end validates the JWT, fetches the user's email and role from it and can then determine whether the user has permission to do whatever they are trying to do.
 
 ## Install and run locally
 
@@ -55,24 +55,15 @@ Realities uses a Neo4j database. You need to run Neo4j on your machine or connec
 
 Set up your connection variables to Neo4j in `api/.env`. With Neo4j running locally, these variables should work for default setups (set `DB_PASSWORD` to the password you entered when creating the Neo4j database):
 
-```
+````
 DB_URL=bolt://127.0.0.1:7687
 DB_USERNAME=neo4j
 DB_PASSWORD=
 
-LOOMIO_API_BASE=https://talk.theborderland.se/api/v1
-LOOMIO_SITE_BASE=https://talk.theborderland.se
-LOOMIO_CRON_SCHEDULE='5 * * * *'
-```
-The LOOMIO* variables are used for accessing the Loomio API to download discussions.
-The LOOMIO_CHRON_SCHEDULE is in standard cron format, starting with minutes. The example above
-runs the download every hour at hh:05.
-
-Make sure you're running the versions of node and npm specified in the api and ui package.json files (node 8.9.x and npm 5.5.x), then...
 
 ```bash
 $ npm install
 $ npm start
-```
+````
 
-You can also `cd` into the `ui` and `api` directories separately and `npm start` them individually. That may be more practical during development since you'll get separate logs for the front-end and back-end. 
+You can also `cd` into the `ui` and `api` directories separately and `npm start` them individually. That may be more practical during development since you'll get separate logs for the front-end and back-end.

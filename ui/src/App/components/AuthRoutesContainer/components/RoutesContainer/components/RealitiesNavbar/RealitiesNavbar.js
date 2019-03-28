@@ -42,7 +42,7 @@ class RealitiesNavbar extends Component {
     return (
       <Navbar color="faded" light expand="md">
         <StyledNavbarBrand tag={Link} to="/">
-          Realities
+          Holi
         </StyledNavbarBrand>
         <div className="flex-grow-1 mr-3 d-none d-md-block ">
           <Search />
@@ -51,7 +51,9 @@ class RealitiesNavbar extends Component {
         <Collapse isOpen={this.state.isOpen} navbar className="flex-grow-0">
           <Nav className="ml-auto" navbar>
             <NavItem>
-              <NavLink tag={Link} to="/about">About</NavLink>
+              <NavLink tag={Link} to="/about">
+                About
+              </NavLink>
             </NavItem>
             {this.props.auth.isLoggedIn ? (
               <UncontrolledDropdown nav>
@@ -60,16 +62,22 @@ class RealitiesNavbar extends Component {
                 </DropdownToggle>
                 <DropdownMenu right>
                   <DropdownItem>
-                    <NavLink tag={Link} to="/profile">Profile</NavLink>
+                    <NavLink tag={Link} to="/profile">
+                      Profile
+                    </NavLink>
                   </DropdownItem>
                   <DropdownItem>
-                    <NavLink onClick={this.props.auth.logout} href="#">Logout</NavLink>
+                    <NavLink onClick={this.props.auth.logout} href="#">
+                      Logout
+                    </NavLink>
                   </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
             ) : (
               <NavItem>
-                <NavLink onClick={this.props.auth.login} href="#">Login</NavLink>
+                <NavLink onClick={this.props.auth.login} href="#">
+                  Login
+                </NavLink>
               </NavItem>
             )}
           </Nav>

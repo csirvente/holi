@@ -4,16 +4,12 @@ import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 import Graph from 'react-graph-vis';
 import _ from 'lodash';
-import {
-  Popover,
-  PopoverBody,
-  PopoverHeader,
-} from 'reactstrap';
+import { Popover, PopoverBody, PopoverHeader } from 'reactstrap';
 import graphUtils from '@/services/graphUtils';
 import WrappedLoader from '@/components/WrappedLoader';
 
-const NEED_FRAGMENT = gql`
-  fragment LocalGraphNeedFields on Need {
+const TAG_FRAGMENT = gql`
+  fragment LocalGraphTagFields on Tag {
     nodeId
     title
     description
@@ -48,30 +44,29 @@ const RESPONSIBILITY_FRAGMENT = gql`
   }
 `;
 
-const GET_NEED = gql`
-  query LocalGraph_need($nodeId: ID!) {
-    need(nodeId: $nodeId) {
-      ...LocalGraphNeedFields
+const GET_TAG = gql`
+  query LocalGraph_tag($nodeId: ID!) {
+    tag(nodeId: $nodeId) {
+      ...LocalGraphTagFields
       fulfilledBy {
         ...LocalGraphResponsibilityFields
       }
-      dependsOnNeeds {
-        ...LocalGraphNeedFields
+      relatesToTags {
+        ...LocalGraphTagFields
       }
-      dependsOnResponsibilities {
+      relatesToResponsibilities {
         ...LocalGraphResponsibilityFields
       }
-      needsThatDependOnThis {
-        ...LocalGraphNeedFields
+      tagsThatRelateToThis {
+        ...LocalGraphTagFields
       }
-      responsibilitiesThatDependOnThis {
+      responsibilitiesThatRelateToThis {
         ...LocalGraphResponsibilityFields
       }
     }
   }
-  ${NEED_FRAGMENT}
+  ${TAG_FRAGMENT}
   ${RESPONSIBILITY_FRAGMENT}
-
 `;
 
 const GET_RESPONSIBILITY = gql`
@@ -79,28 +74,28 @@ const GET_RESPONSIBILITY = gql`
     responsibility(nodeId: $nodeId) {
       ...LocalGraphResponsibilityFields
       fulfills {
-        ...LocalGraphNeedFields
+        ...LocalGraphTagFields
       }
-      dependsOnNeeds {
-        ...LocalGraphNeedFields
+      relatesToTags {
+        ...LocalGraphTagFields
       }
-      dependsOnResponsibilities {
+      relatesToResponsibilities {
         ...LocalGraphResponsibilityFields
       }
-      needsThatDependOnThis {
-        ...LocalGraphNeedFields
+      tagsThatRelateToThis {
+        ...LocalGraphTagFields
       }
-      responsibilitiesThatDependOnThis {
+      responsibilitiesThatRelateToThis {
         ...LocalGraphResponsibilityFields
       }
     }
   }
-  ${NEED_FRAGMENT}
+  ${TAG_FRAGMENT}
   ${RESPONSIBILITY_FRAGMENT}
 `;
 
-const NEED_ON_PERSON_FRAGMENT = gql`
-  fragment NeedOnPerson on Need {
+const TAG_ON_PERSON_FRAGMENT = gql`
+  fragment TagOnPerson on Tag {
     nodeId
     title
     guide {
@@ -129,7 +124,7 @@ const RESPONSIBILITY_ON_PERSON_FRAGMENT = gql`
   fragment ResponsibilityOnPerson on Responsibility {
     nodeId
     title
-    dependsOnResponsibilities {
+    relatesToResponsibilities {
       nodeId
       title
       guide {
@@ -164,11 +159,11 @@ const GET_PERSON = gql`
     person(nodeId: $nodeId) {
       nodeId
       name
-      guidesNeeds {
-        ...NeedOnPerson
+      guidesTags {
+        ...TagOnPerson
       }
-      realizesNeeds {
-        ...NeedOnPerson
+      realizesTags {
+        ...TagOnPerson
       }
       guidesResponsibilities {
         ...ResponsibilityOnPerson
@@ -178,8 +173,8 @@ const GET_PERSON = gql`
       }
     }
   }
-${NEED_ON_PERSON_FRAGMENT}
-${RESPONSIBILITY_ON_PERSON_FRAGMENT}
+  ${TAG_ON_PERSON_FRAGMENT}
+  ${RESPONSIBILITY_ON_PERSON_FRAGMENT}
 `;
 
 const graphOptions = {
@@ -241,8 +236,8 @@ class LocalGraph extends Component {
     const { selectedNode } = this.state;
 
     let gqlQuery;
-    if (nodeType === 'Need') {
-      gqlQuery = GET_NEED;
+    if (nodeType === 'Tag') {
+      gqlQuery = GET_TAG;
     } else if (nodeType === 'Responsibility') {
       gqlQuery = GET_RESPONSIBILITY;
     } else {
@@ -250,40 +245,35 @@ class LocalGraph extends Component {
     }
 
     return (
-      <Query
-        query={gqlQuery}
-        variables={{ nodeId, nodeType }}
-      >
+      <Query query={gqlQuery} variables={{ nodeId, nodeType }}>
         {({
-          loading,
-          error,
-          data,
-          refetch,
-        }) => {
+ loading, error, data, refetch,
+}) => {
           if (loading) return <WrappedLoader />;
           if (error) return `Error! ${error.message}`;
           // The next line is a temporary hack to make up for a bug in Apollo where
           // the query returns an empty data object sometimes:
           // https://github.com/apollographql/apollo-client/issues/3267
-          if (!data.need && !data.responsibility && !data.person) refetch();
+          if (!data.tag && !data.responsibility && !data.person) refetch();
 
           let node;
-          if (nodeType === 'Need') node = data.need;
+          if (nodeType === 'Tag') node = data.tag;
           else if (nodeType === 'Responsibility') node = data.responsibility;
           else node = data.person;
 
           if (!node) return null;
           let graphData;
-          if (nodeType === 'Person') graphData = graphUtils.getPersonGraph(node);
-          else graphData = graphUtils.getSubGraph(node);
+          if (nodeType === 'Person') { graphData = graphUtils.getPersonGraph(node); } else graphData = graphUtils.getSubGraph(node);
           return (
             <div>
               <div id="localGraphWrapper">
                 <Graph
                   graph={graphData}
                   options={graphOptions}
-                  events={{ select: event => this.onSelectNode(event, graphData) }}
-                  style={{ height: '20em' }}
+                  events={{
+                    select: event => this.onSelectNode(event, graphData),
+                  }}
+                  style={{ height: '40em' }}
                 />
               </div>
               <Popover
@@ -295,10 +285,10 @@ class LocalGraph extends Component {
                   {selectedNode && selectedNode.title}
                 </PopoverHeader>
                 <PopoverBody>
-                  {_.truncate(
-                    (selectedNode && selectedNode.description),
-                    { length: 512, separator: ',.?! ' },
-                  )}
+                  {_.truncate(selectedNode && selectedNode.description, {
+                    length: 512,
+                    separator: ',.?! ',
+                  })}
                 </PopoverBody>
               </Popover>
             </div>

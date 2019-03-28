@@ -11,7 +11,7 @@ export const REALITIES_CREATE_SUBSCRIPTION = gql`
         nodeId
         name
       }
-      ... on Need {
+      ... on Tag {
         fulfilledBy {
           nodeId
           title
@@ -64,11 +64,11 @@ export const REALITIES_UPDATE_SUBSCRIPTION = gql`
         email
         name
       }
-      dependsOnNeeds {
+      relatesToTags {
         nodeId
         title
       }
-      dependsOnResponsibilities {
+      relatesToResponsibilities {
         nodeId
         title
         fulfills {

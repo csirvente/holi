@@ -2,7 +2,7 @@ import _ from 'lodash';
 import colors from '@/styles/colors';
 
 const colorCollection = {
-  Need: colors.need,
+  Tag: colors.tag,
   Responsibility: colors.responsibility,
   Person: colors.person,
 };
@@ -72,11 +72,11 @@ function getSubGraph(originNode = {}) {
   pushNode(graph, originNode, originNode.guide, 'Guides', 'OUT');
   pushNode(graph, originNode, originNode.realizer, 'Realizes', 'OUT');
   pushNode(graph, originNode, originNode.fulfills, 'Fulfills', 'IN');
-  pushNode(graph, originNode, originNode.dependsOnNeeds, 'Depends on', 'IN');
-  pushNode(graph, originNode, originNode.dependsOnResponsibilities, 'Depends on', 'IN');
+  pushNode(graph, originNode, originNode.relatesToTags, 'Relates to', 'IN');
+  pushNode(graph, originNode, originNode.relatesToResponsibilities, 'Relates to', 'IN');
   pushNode(graph, originNode, originNode.fulfilledBy, 'Fulfills', 'OUT');
-  pushNode(graph, originNode, originNode.needsThatDependOnThis, 'Depends on', 'OUT');
-  pushNode(graph, originNode, originNode.responsibilitiesThatDependOnThis, 'Depends on', 'OUT');
+  pushNode(graph, originNode, originNode.tagsThatRelateToThis, 'Relates to', 'OUT');
+  pushNode(graph, originNode, originNode.responsibilitiesThatRelateToThis, 'Relates to', 'OUT');
 
   return graph;
 }
@@ -99,26 +99,26 @@ function getPersonGraph(originNode = {}) {
   function pushNodesToSubsequentNodes(userNodeId, nodes, role, relation) {
     nodes.forEach((node) => {
       // The following check is to prevent duplicate edges between a
-      // need/responsibility and a person.
+      // tag/responsibility and a person.
       if (node[role] && node[role].nodeId !== userNodeId) {
         pushNode(graph, node, node[role], relation, 'IN');
       }
-      // If node is a responsibility, add node for the need it fulfills and
-      // for every responsibility that depends on it.
+      // If node is a responsibility, add node for the tag it fulfills and
+      // for every responsibility that relate to it.
       if (node.__typename === 'Responsibility') {
         pushNode(graph, node, node.fulfills, 'Fulfills', 'IN');
-        node.dependsOnResponsibilities.forEach((responsibility) => {
-          pushNode(graph, node, responsibility, 'Depends On', 'IN');
+        node.relatesToResponsibilities.forEach((responsibility) => {
+          pushNode(graph, node, responsibility, 'Relates to', 'IN');
         });
       }
     });
   }
 
-  pushNode(graph, originNode, originNode.guidesNeeds, 'Guides', 'IN');
-  pushNodesToSubsequentNodes(originNode.nodeId, originNode.guidesNeeds, 'realizer', 'Realizes');
+  pushNode(graph, originNode, originNode.guidesTags, 'Guides', 'IN');
+  pushNodesToSubsequentNodes(originNode.nodeId, originNode.guidesTags, 'realizer', 'Realizes');
 
-  pushNode(graph, originNode, originNode.realizesNeeds, 'Realizes', 'IN');
-  pushNodesToSubsequentNodes(originNode.nodeId, originNode.realizesNeeds, 'guide', 'Guides');
+  pushNode(graph, originNode, originNode.realizesTags, 'Realizes', 'IN');
+  pushNodesToSubsequentNodes(originNode.nodeId, originNode.realizesTags, 'guide', 'Guides');
 
   pushNode(graph, originNode, originNode.guidesResponsibilities, 'Guides', 'IN');
   pushNodesToSubsequentNodes(originNode.nodeId, originNode.guidesResponsibilities, 'realizer', 'Realizes');

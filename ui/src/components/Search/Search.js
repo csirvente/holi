@@ -17,7 +17,7 @@ const Search = withRouter(({ history }) => (
       reset();
       if (node) {
         switch (node.__typename) {
-          case 'Need':
+          case 'Tag':
             history.push(`/${node.nodeId}`);
             break;
           case 'Responsibility':

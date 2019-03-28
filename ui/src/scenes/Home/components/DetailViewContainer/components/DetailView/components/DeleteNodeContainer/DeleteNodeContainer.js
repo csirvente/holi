@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { withRouter } from 'react-router-dom';
 import { Mutation } from 'react-apollo';
-import { GET_NEEDS, GET_RESPONSIBILITIES } from '@/services/queries';
+import { GET_TAGS, GET_RESPONSIBILITIES } from '@/services/queries';
 import DeleteNodeButton from './components/DeleteNodeButton';
 
-const SOFT_DELETE_NEED = gql`
-  mutation DeleteNodeContainer_softDeleteNeed($nodeId: ID!) {
-    softDeleteNeed(nodeId: $nodeId) {
+const SOFT_DELETE_TAG = gql`
+  mutation DeleteNodeContainer_softDeleteTag($nodeId: ID!) {
+    softDeleteTag(nodeId: $nodeId) {
       nodeId
       deleted
     }
@@ -43,34 +43,34 @@ class DeleteNodeContainer extends Component {
   render() {
     return (
       <Mutation
-        mutation={this.props.nodeType === 'Need' ? SOFT_DELETE_NEED : SOFT_DELETE_RESPONSIBILITY}
+        mutation={this.props.nodeType === 'Tag' ? SOFT_DELETE_TAG : SOFT_DELETE_RESPONSIBILITY}
         update={(cache, { data }) => {
           this.setState({ confirmationModalIsOpen: false });
           cache.writeData({ data: { showDetailedEditView: false } });
-          if (this.props.nodeType === 'Need') {
-            const { needs } = cache.readQuery({ query: GET_NEEDS });
+          if (this.props.nodeType === 'Tag') {
+            const { tags } = cache.readQuery({ query: GET_TAGS });
             cache.writeQuery({
-              query: GET_NEEDS,
+              query: GET_TAGS,
               data: {
-                needs: needs.filter(n => n.nodeId !== data.softDeleteNeed.nodeId),
+                tags: tags.filter(n => n.nodeId !== data.softDeleteTag.nodeId),
               },
             });
             this.props.history.push('/');
           } else {
-            const needId = data.softDeleteResponsibility.fulfills.nodeId;
+            const tagId = data.softDeleteResponsibility.fulfills.nodeId;
             const { responsibilities } = cache.readQuery({
               query: GET_RESPONSIBILITIES,
-              variables: { needId },
+              variables: { tagId },
             });
             cache.writeQuery({
               query: GET_RESPONSIBILITIES,
-              variables: { needId },
+              variables: { tagId },
               data: {
                 responsibilities: responsibilities
                   .filter(r => r.nodeId !== data.softDeleteResponsibility.nodeId),
               },
             });
-            this.props.history.push(`/${needId}`);
+            this.props.history.push(`/${tagId}`);
           }
         }}
       >
@@ -98,7 +98,7 @@ DeleteNodeContainer.propTypes = {
 };
 
 DeleteNodeContainer.defaultProps = {
-  nodeType: 'Need',
+  nodeType: 'Tag',
   nodeId: '',
   history: {
     push: () => null,

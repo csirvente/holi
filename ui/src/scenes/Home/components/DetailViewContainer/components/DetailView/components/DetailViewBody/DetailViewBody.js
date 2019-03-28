@@ -1,17 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import {
-  Card,
-  CardBody,
-  CardText,
-  CardTitle,
-} from 'reactstrap';
-import Dependencies from '@/components/Dependencies';
+import { CardBody, CardText, CardTitle } from 'reactstrap'; // Card
+import Interrelations from '@/components/Interrelations';
 import RealizersMissingIcon from '@/components/RealizersMissingIcon';
 import Deliberations from '@/components/Deliberations';
-import LocalGraph from '@/components/LocalGraph';
-
+// import LocalGraph from '@/components/LocalGraph';
 
 const LabelSpan = styled.span`
   font-weight: bold;
@@ -24,69 +18,51 @@ const CardSection = styled.div`
 
 const DetailViewBody = ({ node }) => (
   <CardBody>
-    <CardTitle>
-      {node.title}
-    </CardTitle>
+    <CardTitle>{node.title}</CardTitle>
 
     <CardText>
-      <LabelSpan>
-        Guide:
-      </LabelSpan>
-      {node.guide && (
-        node.guide.name
+      <LabelSpan>Source:</LabelSpan>
+      {node.guide &&
+        (node.guide.name
           ? `${node.guide.name} (${node.guide.email})`
-          : node.guide.email
-      )}
+          : node.guide.email)}
     </CardText>
 
     <CardText>
-      <LabelSpan>
-        Realizer:
-      </LabelSpan>
-      {node.realizer && (
-        node.realizer.name
+      <LabelSpan>Added by:</LabelSpan>
+      {node.realizer &&
+        (node.realizer.name
           ? `${node.realizer.name} (${node.realizer.email})`
-          : node.realizer.email
-      )}
+          : node.realizer.email)}
       {!node.realizer && <RealizersMissingIcon />}
     </CardText>
 
     <CardText>
-      <LabelSpan>
-        Description:
-      </LabelSpan>
+      <LabelSpan>Description:</LabelSpan>
       {node.description}
     </CardText>
 
     <CardSection>
-      <LabelSpan>Deliberations:</LabelSpan>
+      <LabelSpan>link:</LabelSpan>
       <Deliberations
         nodeType={node.__typename}
         nodeId={node.nodeId}
-        deliberations={[
-          ...(node.deliberations || []),
-        ]}
+        deliberations={[...(node.deliberations || [])]}
       />
     </CardSection>
 
     <CardSection>
-      <LabelSpan>Depends on:</LabelSpan>
-      <Dependencies
+      <LabelSpan>Tags:</LabelSpan>
+      <Interrelations
         nodeType={node.__typename}
         nodeId={node.nodeId}
-        dependencies={[
-          ...(node.dependsOnNeeds || []),
-          ...(node.dependsOnResponsibilities || []),
+        interrelations={[
+          ...(node.relatesToTags || []),
+          ...(node.relatesToResponsibilities || []),
         ]}
       />
     </CardSection>
 
-    <CardSection>
-      <LabelSpan>Graph:</LabelSpan>
-      <Card>
-        <LocalGraph nodeType={node.__typename} nodeId={node.nodeId} />
-      </Card>
-    </CardSection>
   </CardBody>
 );
 
@@ -113,12 +89,12 @@ DetailViewBody.propTypes = {
       title: PropTypes.string,
       url: PropTypes.string,
     })),
-    dependsOnNeeds: PropTypes.arrayOf(PropTypes.shape({
+    relatesToTags: PropTypes.arrayOf(PropTypes.shape({
       __typename: PropTypes.string,
       nodeId: PropTypes.string,
       title: PropTypes.string,
     })),
-    dependsOnResponsibilities: PropTypes.arrayOf(PropTypes.shape({
+    relatesToResponsibilities: PropTypes.arrayOf(PropTypes.shape({
       __typename: PropTypes.string,
       nodeId: PropTypes.string,
       title: PropTypes.string,
@@ -146,8 +122,8 @@ DetailViewBody.defaultProps = {
       name: '',
     },
     hasDeliberations: [],
-    dependsOnNeeds: [],
-    dependsOnResponsibilities: [],
+    relatesToTags: [],
+    relatesToResponsibilities: [],
   },
 };
 

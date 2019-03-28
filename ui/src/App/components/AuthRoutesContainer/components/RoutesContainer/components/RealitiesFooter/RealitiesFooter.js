@@ -13,7 +13,7 @@ const StyledFooter = styled.footer`
 
 const RealitiesFooter = () => (
   <StyledFooter className="text-muted">
-    A tool for tribal decentralised organisations.
+    Spring knowledge - Get your world organized.
   </StyledFooter>
 );
 

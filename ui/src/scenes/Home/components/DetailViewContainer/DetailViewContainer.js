@@ -29,11 +29,11 @@ const createDetailViewQuery = nodeType => gql`
         title
         url
       }
-      dependsOnNeeds {
+      relatesToTags {
         nodeId
         title
       }
-      dependsOnResponsibilities {
+      relatesToResponsibilities {
         nodeId
         title
         fulfills {
@@ -46,16 +46,16 @@ const createDetailViewQuery = nodeType => gql`
 `;
 
 
-const GET_NEED = createDetailViewQuery('need');
+const GET_TAG = createDetailViewQuery('tag');
 const GET_RESPONSIBILITY = createDetailViewQuery('responsibility');
 
 const DetailViewContainer = withAuth(withRouter(({ auth, match }) => {
-  if (!match.params.needId && !match.params.responsibilityId) return null;
+  if (!match.params.tagId && !match.params.responsibilityId) return null;
 
   const queryProps = !match.params.responsibilityId ? {
-    query: GET_NEED,
+    query: GET_TAG,
     variables: {
-      nodeId: match.params.needId,
+      nodeId: match.params.tagId,
     },
   } : {
     query: GET_RESPONSIBILITY,
@@ -74,7 +74,7 @@ const DetailViewContainer = withAuth(withRouter(({ auth, match }) => {
       }) => {
         if (loading) return <WrappedLoader />;
         if (error) return `Error! ${error.message}`;
-        const node = !match.params.responsibilityId ? data.need : data.responsibility;
+        const node = !match.params.responsibilityId ? data.tag : data.responsibility;
         if (!node) return null;
         return (
           <DetailView
@@ -96,7 +96,7 @@ DetailViewContainer.propTypes = {
   }),
   match: PropTypes.shape({
     params: PropTypes.shape({
-      needId: PropTypes.string,
+      tagId: PropTypes.string,
       resposibilityId: PropTypes.string,
     }),
   }),
@@ -108,7 +108,7 @@ DetailViewContainer.defaultProps = {
   },
   match: {
     params: {
-      needId: undefined,
+      tagId: undefined,
       responsibilityId: undefined,
     },
   },

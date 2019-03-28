@@ -17,29 +17,29 @@ const typeDefs = `
       email: String
       nodeId: ID
     ): Person
-    needs(search: String): [Need]
-    need(nodeId: ID!): Need
-    responsibilities(fulfillsNeedId: ID, search: String): [Responsibility]
+    tags(search: String): [Tag]
+    tag(nodeId: ID!): Tag
+    responsibilities(fulfillsTagId: ID, search: String): [Responsibility]
     responsibility(nodeId: ID!): Responsibility
     infos(search: String): [Info]
     info(url: String!): [Info]
   }
 
   type Mutation {
-    createNeed(title: String!): Need
+    createTag(title: String!): Tag
     createResponsibility(
       title: String!
-      needId: ID!
+      tagId: ID!
     ): Responsibility 
     createViewer: Person
-    updateNeed(
+    updateTag(
       nodeId: ID!
       title: String!
       guideEmail: String!
       realizerEmail: String
       description: String
       deliberationLink: String
-    ): Need
+    ): Tag
     updateResponsibility(
       nodeId: ID!
       title: String!
@@ -49,40 +49,40 @@ const typeDefs = `
       deliberationLink: String
     ): Responsibility
     updateViewerName(name: String!): Person
-    softDeleteNeed(nodeId: ID!): Need
+    softDeleteTag(nodeId: ID!): Tag
     softDeleteResponsibility(nodeId: ID!): Responsibility
-    addNeedDependsOnNeeds(
-      from: _NeedInput!
-      to: _NeedInput!
-    ): _NeedDependsOnNeedsPayload
-    addNeedDependsOnResponsibilities(
-      from: _NeedInput!
+    addTagRelatesToTags(
+      from: _TagInput!
+      to: _TagInput!
+    ): _TagRelatesToTagsPayload
+    addTagRelatesToResponsibilities(
+      from: _TagInput!
       to: _ResponsibilityInput!
-    ): _NeedDependsOnResponsibilitiesPayload
-    addResponsibilityDependsOnNeeds(
+    ): _TagRelatesToResponsibilitiesPayload
+    addResponsibilityRelatesToTags(
       from: _ResponsibilityInput!
-      to: _NeedInput!
-    ): _ResponsibilityDependsOnNeedsPayload
-    addResponsibilityDependsOnResponsibilities(
-      from: _ResponsibilityInput!
-      to: _ResponsibilityInput!
-    ): _ResponsibilityDependsOnResponsibilitiesPayload
-    removeNeedDependsOnNeeds(
-      from: _NeedInput!
-      to: _NeedInput!
-    ): _NeedDependsOnNeedsPayload
-    removeNeedDependsOnResponsibilities(
-      from: _NeedInput!
-      to: _ResponsibilityInput!
-    ): _NeedDependsOnResponsibilitiesPayload
-    removeResponsibilityDependsOnNeeds(
-      from: _ResponsibilityInput!
-      to: _NeedInput!
-    ): _ResponsibilityDependsOnNeedsPayload
-    removeResponsibilityDependsOnResponsibilities(
+      to: _TagInput!
+    ): _ResponsibilityRelatesToTagsPayload
+    addResponsibilityRelatesToResponsibilities(
       from: _ResponsibilityInput!
       to: _ResponsibilityInput!
-    ): _ResponsibilityDependsOnResponsibilitiesPayload
+    ): _ResponsibilityRelatesToResponsibilitiesPayload
+    removeTagRelatesToTags(
+      from: _TagInput!
+      to: _TagInput!
+    ): _TagRelatesToTagsPayload
+    removeTagRelatesToResponsibilities(
+      from: _TagInput!
+      to: _ResponsibilityInput!
+    ): _TagRelatesToResponsibilitiesPayload
+    removeResponsibilityRelatesToTags(
+      from: _ResponsibilityInput!
+      to: _TagInput!
+    ): _ResponsibilityRelatesToTagsPayload
+    removeResponsibilityRelatesToResponsibilities(
+      from: _ResponsibilityInput!
+      to: _ResponsibilityInput!
+    ): _ResponsibilityRelatesToResponsibilitiesPayload
     createInfo(
       title: String
       url: String!
@@ -107,8 +107,8 @@ const typeDefs = `
     name: String
     email: String!
     created: String
-    guidesNeeds: [Need]
-    realizesNeeds: [Need]
+    guidesTags: [Tag]
+    realizesTags: [Tag]
     guidesResponsibilities: [Responsibility]
     realizesResponsibilities: [Responsibility]
   }
@@ -122,14 +122,14 @@ const typeDefs = `
     deleted: String
     guide: Person
     realizer: Person
-    dependsOnNeeds: [Need]
-    dependsOnResponsibilities: [Responsibility]
-    needsThatDependOnThis: [Need]
-    responsibilitiesThatDependOnThis: [Responsibility]
+    relatesToTags: [Tag]
+    relatesToResponsibilities: [Responsibility]
+    tagsThatRelateToThis: [Tag]
+    responsibilitiesThatRelateToThis: [Responsibility]
     deliberations: [Info]
   }
 
-  type Need implements Reality {
+  type Tag implements Reality {
     nodeId: ID!
     title: String!
     description: String
@@ -139,10 +139,10 @@ const typeDefs = `
     guide: Person
     realizer: Person
     fulfilledBy: [Responsibility]
-    dependsOnNeeds: [Need]
-    dependsOnResponsibilities: [Responsibility]
-    needsThatDependOnThis: [Need]
-    responsibilitiesThatDependOnThis: [Responsibility]
+    relatesToTags: [Tag]
+    relatesToResponsibilities: [Responsibility]
+    tagsThatRelateToThis: [Tag]
+    responsibilitiesThatRelateToThis: [Responsibility]
     deliberations: [Info]
   }
 
@@ -155,11 +155,11 @@ const typeDefs = `
     deleted: String
     guide: Person
     realizer: Person
-    fulfills: Need
-    dependsOnNeeds: [Need]
-    dependsOnResponsibilities: [Responsibility]
-    needsThatDependOnThis: [Need]
-    responsibilitiesThatDependOnThis: [Responsibility]
+    fulfills: Tag
+    relatesToTags: [Tag]
+    relatesToResponsibilities: [Responsibility]
+    tagsThatRelateToThis: [Tag]
+    responsibilitiesThatRelateToThis: [Responsibility]
     deliberations: [Info]
   }
 
@@ -172,7 +172,7 @@ const typeDefs = `
     deleted: String
   }
 
-  input _NeedInput {
+  input _TagInput {
     nodeId: ID!
   }
 
@@ -188,22 +188,22 @@ const typeDefs = `
     url: String!
   }
 
-  type _NeedDependsOnNeedsPayload {
-    from: Need
-    to: Need
+  type _TagRelatesToTagsPayload {
+    from: Tag
+    to: Tag
   }
 
-  type _NeedDependsOnResponsibilitiesPayload {
-    from: Need
+  type _TagRelatesToResponsibilitiesPayload {
+    from: Tag
     to: Responsibility
   }
 
-  type _ResponsibilityDependsOnNeedsPayload {
+  type _ResponsibilityRelatesToTagsPayload {
     from: Responsibility
-    to: Need
+    to: Tag
   }
 
-  type _ResponsibilityDependsOnResponsibilitiesPayload {
+  type _ResponsibilityRelatesToResponsibilitiesPayload {
     from: Responsibility
     to: Responsibility
   }

@@ -9,8 +9,8 @@ import { GET_RESPONSIBILITIES } from '@/services/queries';
 import ListForm from '@/components/ListForm';
 
 const CREATE_RESPONSIBILITY = gql`
-  mutation CreateResponsibility_createResponsibilityMutation($title: String!, $needId: ID!) {
-    createResponsibility(title: $title, needId: $needId) {
+  mutation CreateResponsibility_createResponsibilityMutation($title: String!, $tagId: ID!) {
+    createResponsibility(title: $title, tagId: $tagId) {
       nodeId
       title
       realizer {
@@ -28,7 +28,7 @@ const CreateResponsibility = withRouter(({ match, history }) => (
       cache.writeData({ data: { showCreateResponsibility: false } });
       const { responsibilities } = cache.readQuery({
         query: GET_RESPONSIBILITIES,
-        variables: { needId: match.params.needId },
+        variables: { tagId: match.params.tagId },
       });
 
       const alreadyExists =
@@ -37,7 +37,7 @@ const CreateResponsibility = withRouter(({ match, history }) => (
       if (!alreadyExists) {
         cache.writeQuery({
           query: GET_RESPONSIBILITIES,
-          variables: { needId: match.params.needId },
+          variables: { tagId: match.params.tagId },
           data: {
             responsibilities: [createResponsibility, ...responsibilities],
           },
@@ -55,11 +55,11 @@ const CreateResponsibility = withRouter(({ match, history }) => (
           createResponsibility({
             variables: {
               title: values.title,
-              needId: match.params.needId,
+              tagId: match.params.tagId,
             },
           }).then(({ data }) => {
             resetForm();
-            history.push(`/${match.params.needId}/${data.createResponsibility.nodeId}`);
+            history.push(`/${match.params.tagId}/${data.createResponsibility.nodeId}`);
           });
         }}
       >
@@ -72,7 +72,7 @@ const CreateResponsibility = withRouter(({ match, history }) => (
         }) => (
           <ListForm
             inputName="title"
-            placeholder="Enter a title for the new responsibility..."
+            placeholder="Enter a title for the new note..."
             value={values.title}
             handleChange={handleChange}
             handleBlur={handleBlur}
@@ -88,7 +88,7 @@ const CreateResponsibility = withRouter(({ match, history }) => (
 CreateResponsibility.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({
-      needId: PropTypes.string,
+      tagId: PropTypes.string,
     }),
   }),
   history: PropTypes.shape({
@@ -99,7 +99,7 @@ CreateResponsibility.propTypes = {
 CreateResponsibility.defaultProps = {
   match: {
     params: {
-      needId: undefined,
+      tagId: undefined,
     },
   },
   history: {

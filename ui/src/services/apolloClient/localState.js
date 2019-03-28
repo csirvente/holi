@@ -8,7 +8,7 @@ export const resolvers = {
 };
 
 export const defaults = {
-  showCreateNeed: false,
+  showCreateTag: false,
   showCreateResponsibility: false,
   showDetailedEditView: false,
 };

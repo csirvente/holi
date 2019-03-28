@@ -1,14 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import {
-  Col,
-  Container,
-  Row,
-} from 'reactstrap';
+import { Col, Container, Row } from 'reactstrap';
 import Search from '@/components/Search';
-import NeedsContainer from './components/NeedsContainer';
+import TagsContainer from './components/TagsContainer';
 import ResponsibilitiesContainer from './components/ResponsibilitiesContainer';
 import DetailViewContainer from './components/DetailViewContainer';
+import DetailViewContainerGraph from './components/DetailViewContainerGraph';
 
 const SearchRow = styled(Row)`
   margin-bottom: 20px;
@@ -25,15 +22,16 @@ const Home = () => (
       <Col md="6">
         <Row>
           <Col lg="6">
-            <NeedsContainer />
+            <TagsContainer />
           </Col>
           <Col lg="6">
+            <DetailViewContainer />
             <ResponsibilitiesContainer />
           </Col>
         </Row>
       </Col>
       <Col md="6">
-        <DetailViewContainer />
+        <DetailViewContainerGraph />
       </Col>
     </Row>
   </Container>

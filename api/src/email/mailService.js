@@ -42,8 +42,8 @@ export const sendUpdateMail = async (
   }
   const template = pug.compileFile('src/email/templates/updateReality.pug');
   const emailHtml = template({
-    realityUrl: (oldRealityData.linkedNeedId
-      ? `${appUrl}${oldRealityData.linkedNeedId}/${updatedRealityData.nodeId}`
+    realityUrl: (oldRealityData.linkedTagId
+      ? `${appUrl}${oldRealityData.linkedTagId}/${updatedRealityData.nodeId}`
       : `${appUrl}${updatedRealityData.nodeId}`
     ),
     realityName: oldRealityData.title,

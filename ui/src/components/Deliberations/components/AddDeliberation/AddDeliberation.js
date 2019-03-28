@@ -28,28 +28,27 @@ const ADD_REALITY_HAS_DELIBERATION = gql`
   }
 `;
 
-
 const InvalidUrlText = styled.span`
   color: #ff0000;
   font-weight: bold;
 `;
 
 const AddDeliberation = withRouter(({ nodeId }) => (
-  <Mutation
-    mutation={ADD_REALITY_HAS_DELIBERATION}
-
-  >
+  <Mutation mutation={ADD_REALITY_HAS_DELIBERATION}>
     {createDeliberation => (
       <FormGroup>
-
         <Formik
           initialValues={{ url: '' }}
           validationSchema={yup.object().shape({
-            url: yup.string().required('URL is required').url('Invalid URL'),
+            url: yup
+              .string()
+              .required('URL is required')
+              .url('Invalid URL'),
           })}
           onSubmit={(values, { resetForm }) => {
-            createDeliberation({ variables: { from: { nodeId }, to: { url: values.url } } })
-              .then(() => {
+            createDeliberation({
+              variables: { from: { nodeId }, to: { url: values.url } },
+            }).then(() => {
               resetForm();
             });
           }}
@@ -62,28 +61,30 @@ const AddDeliberation = withRouter(({ nodeId }) => (
             isSubmitting,
             errors,
             touched,
-            }) => (
-              <div>
-                <Label for="editDeliberationUrl">
-                  Add a deliberation {touched.url && errors.url &&
-                    <InvalidUrlText>
-                      <FaChainBroken /> {errors.url}
-                    </InvalidUrlText>}
-                </Label>
-                <InfoForm
-                  inputName="url"
-                  placeholder="Enter a deliberation URL..."
-                  value={values.url}
-                  handleChange={handleChange}
-                  handleBlur={handleBlur}
-                  handleSubmit={handleSubmit}
-                  isSubmitting={isSubmitting}
-                />
-              </div>
+          }) => (
+            <div>
+              <Label for="editDeliberationUrl">
+                Add a link{' '}
+                {touched.url && errors.url && (
+                  <InvalidUrlText>
+                    <FaChainBroken /> {errors.url}
+                  </InvalidUrlText>
+                )}
+              </Label>
+              <InfoForm
+                inputName="url"
+                placeholder="Enter an URL..."
+                value={values.url}
+                handleChange={handleChange}
+                handleBlur={handleBlur}
+                handleSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+              />
+            </div>
           )}
         </Formik>
       </FormGroup>
-        )}
+    )}
   </Mutation>
 ));
 

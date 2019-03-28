@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Card,
-  CardBody,
-  Container,
-  Row,
-  Col,
-} from 'reactstrap';
+import { Card, CardBody, Container, Row, Col } from 'reactstrap';
 
 const About = () => (
   <Container fluid>
@@ -14,7 +8,7 @@ const About = () => (
         <Card>
           <CardBody>
             <h1>About</h1>
-            <p>A tool for tribal decentralised organisations.</p>
+            <p>Spring knowledge - get your world organized</p>
           </CardBody>
         </Card>
       </Col>

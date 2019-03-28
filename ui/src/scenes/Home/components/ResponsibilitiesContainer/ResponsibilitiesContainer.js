@@ -23,21 +23,21 @@ const GET_SHOW_CREATE_RESPONSIBILITY = gql`
 `;
 
 const ResponsibilitiesContainer = withAuth(withRouter(({ auth, match }) => {
-  if (!match.params.needId) return null;
+  if (!match.params.tagId) return null;
 
   return (
     <Query query={GET_SHOW_CREATE_RESPONSIBILITY}>
       {({ data: localData, client }) => (
         <div>
           <ListHeader
-            text="Responsibilities"
+            text="Add a note"
             color={colors.responsibility}
-            showButton={auth.isLoggedIn && !!match.params.needId}
+            showButton={auth.isLoggedIn && !!match.params.tagId}
             onButtonClick={() =>
                 client.writeData({
                   data: {
                     showCreateResponsibility: !localData.showCreateResponsibility,
-                    showCreateNeed: false,
+                    showCreateTag: false,
                   },
                 })
               }
@@ -45,15 +45,12 @@ const ResponsibilitiesContainer = withAuth(withRouter(({ auth, match }) => {
           {localData.showCreateResponsibility && <CreateResponsibility />}
           <Query
             query={GET_RESPONSIBILITIES}
-            variables={{ needId: match.params.needId }}
+            variables={{ tagId: match.params.tagId }}
             fetchPolicy="cache-and-network"
           >
             {({
-              subscribeToMore,
-              loading,
-              error,
-              data,
-            }) => {
+ subscribeToMore, loading, error, data,
+}) => {
                 if (loading && !data.responsibilities) return <WrappedLoader />;
                 if (error) return `Error! ${error.message}`;
                 if (!data.responsibilities) return null;
@@ -64,26 +61,33 @@ const ResponsibilitiesContainer = withAuth(withRouter(({ auth, match }) => {
                     subscribeToResponsibilitiesEvents={() => {
                       subscribeToMore({
                         document: REALITIES_CREATE_SUBSCRIPTION,
-                        updateQuery: (prev, { subscriptionData, variables }) => {
+                        updateQuery: (
+                          prev,
+                          { subscriptionData, variables },
+                        ) => {
                           if (!subscriptionData.data) return prev;
 
                           const { realityCreated } = subscriptionData.data;
 
                           // do nothing if the reality is not a responsibility or
-                          // if it does not belong to this need
+                          // if it does not belong to this tag
                           if (
                             realityCreated.__typename !== 'Responsibility' ||
-                            realityCreated.fulfills.nodeId !== variables.needId
-                          ) { return prev; }
+                            realityCreated.fulfills.nodeId !== variables.tagId
+                          ) {
+                            return prev;
+                          }
 
                           // item will already exist in cache if it was added by the current client
-                          const alreadyExists = prev.responsibilities
-                            .filter(resp => resp.nodeId === realityCreated.nodeId)
-                            .length > 0;
+                          const alreadyExists =
+    prev.responsibilities.filter(resp => resp.nodeId === realityCreated.nodeId).length > 0;
 
                           if (alreadyExists) return prev;
                           return {
-                            responsibilities: [realityCreated, ...prev.responsibilities],
+                            responsibilities: [
+                              realityCreated,
+                              ...prev.responsibilities,
+                            ],
                           };
                         },
                       });
@@ -95,8 +99,7 @@ const ResponsibilitiesContainer = withAuth(withRouter(({ auth, match }) => {
                           const { realityDeleted } = subscriptionData.data;
 
                           return {
-                            responsibilities: prev.responsibilities
-                              .filter(item => item.nodeId !== realityDeleted.nodeId),
+    responsibilities: prev.responsibilities.filter(item => item.nodeId !== realityDeleted.nodeId),
                           };
                         },
                       });
@@ -109,9 +112,9 @@ const ResponsibilitiesContainer = withAuth(withRouter(({ auth, match }) => {
 
                           return {
                             responsibilities: prev.responsibilities.map((item) => {
-                              if (item.nodeId === realityUpdated.nodeId) return realityUpdated;
-                              return item;
-                            }),
+    if (item.nodeId === realityUpdated.nodeId) { return realityUpdated; }
+                                return item;
+                              }),
                           };
                         },
                       });
@@ -132,7 +135,7 @@ ResponsibilitiesContainer.propTypes = {
   }),
   match: PropTypes.shape({
     params: PropTypes.shape({
-      needId: PropTypes.string,
+      tagId: PropTypes.string,
       resposibilityId: PropTypes.string,
     }),
   }),
@@ -144,7 +147,7 @@ ResponsibilitiesContainer.defaultProps = {
   },
   match: {
     params: {
-      needId: undefined,
+      tagId: undefined,
       responsibilityId: undefined,
     },
   },

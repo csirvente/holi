@@ -9,11 +9,11 @@ const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 
 const envPublicUrl = process.env.PUBLIC_URL;
 
-function ensureSlash(input, needsSlash) {
+function ensureSlash(input, tagsSlash) {
   const hasSlash = input.endsWith('/');
-  if (hasSlash && !needsSlash) {
+  if (hasSlash && !tagsSlash) {
     return input.substr(input, input.length - 1);
-  } else if (!hasSlash && needsSlash) {
+  } else if (!hasSlash && tagsSlash) {
     return `${input}/`;
   }
   return input;

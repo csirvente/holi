@@ -66,7 +66,7 @@ DeleteNodeButton.propTypes = {
 };
 
 DeleteNodeButton.defaultProps = {
-  nodeType: 'Need',
+  nodeType: 'Tag',
   confirmationModalIsOpen: false,
   onToggleConfirmationModal: () => null,
   onConfirmSoftDelete: () => null,

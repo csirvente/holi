@@ -8,14 +8,14 @@ import {
   findNodeByLabelAndProperty,
   findNodesByRelationshipAndLabel,
   findNodeByRelationshipAndLabel,
-  createNeed,
+  createTag,
   createResponsibility,
   createViewer,
   updateReality,
   updateViewerName,
   softDeleteNode,
-  addDependency,
-  removeDependency,
+  addInterrelation,
+  removeInterrelation,
   addRealityHasDeliberation,
   removeDeliberation,
   searchPersons,
@@ -53,16 +53,16 @@ const resolvers = {
         'were both undefined. Please provide at least one.';
       return new Error(errorMessage);
     },
-    needs(obj, { search }, { driver }) {
-      if (search) return searchRealities(driver, 'Need', search);
-      return findNodesByLabel(driver, 'Need');
+    tags(obj, { search }, { driver }) {
+      if (search) return searchRealities(driver, 'Tag', search);
+      return findNodesByLabel(driver, 'Tag');
     },
-    need(obj, { nodeId }, { driver }) {
-      return findNodeByLabelAndId(driver, 'Need', nodeId);
+    tag(obj, { nodeId }, { driver }) {
+      return findNodeByLabelAndId(driver, 'Tag', nodeId);
     },
-    responsibilities(obj, { search, fulfillsNeedId }, { driver }) {
+    responsibilities(obj, { search, fulfillsTagId }, { driver }) {
       if (search) return searchRealities(driver, 'Responsibility', search);
-      if (fulfillsNeedId) return findNodesByRelationshipAndLabel(driver, fulfillsNeedId, 'FULFILLS', 'Responsibility', 'IN');
+      if (fulfillsTagId) return findNodesByRelationshipAndLabel(driver, fulfillsTagId, 'FULFILLS', 'Responsibility', 'IN');
       return findNodesByLabel(driver, 'Responsibility');
     },
     responsibility(obj, { nodeId }, { driver }) {
@@ -73,11 +73,11 @@ const resolvers = {
     created({ created }) {
       return created.toString();
     },
-    guidesNeeds({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'GUIDES', 'Need');
+    guidesTags({ nodeId }, args, { driver }) {
+      return findNodesByRelationshipAndLabel(driver, nodeId, 'GUIDES', 'Tag');
     },
-    realizesNeeds({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'REALIZES', 'Need');
+    realizesTags({ nodeId }, args, { driver }) {
+      return findNodesByRelationshipAndLabel(driver, nodeId, 'REALIZES', 'Tag');
     },
     guidesResponsibilities({ nodeId }, args, { driver }) {
       return findNodesByRelationshipAndLabel(driver, nodeId, 'GUIDES', 'Responsibility');
@@ -102,45 +102,45 @@ const resolvers = {
     realizer({ nodeId }, args, { driver }) {
       return findNodeByRelationshipAndLabel(driver, nodeId, 'REALIZES', 'Person', 'IN');
     },
-    dependsOnNeeds({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'DEPENDS_ON', 'Need');
+    relatesToTags({ nodeId }, args, { driver }) {
+      return findNodesByRelationshipAndLabel(driver, nodeId, 'RELATES_TO', 'Tag');
     },
-    dependsOnResponsibilities({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'DEPENDS_ON', 'Responsibility');
+    relatesToResponsibilities({ nodeId }, args, { driver }) {
+      return findNodesByRelationshipAndLabel(driver, nodeId, 'RELATES_TO', 'Responsibility');
     },
-    needsThatDependOnThis({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'DEPENDS_ON', 'Need', 'IN');
+    tagsThatRelateToThis({ nodeId }, args, { driver }) {
+      return findNodesByRelationshipAndLabel(driver, nodeId, 'RELATES_TO', 'Tag', 'IN');
     },
-    responsibilitiesThatDependOnThis({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'DEPENDS_ON', 'Responsibility', 'IN');
+    responsibilitiesThatRelateToThis({ nodeId }, args, { driver }) {
+      return findNodesByRelationshipAndLabel(driver, nodeId, 'RELATES_TO', 'Responsibility', 'IN');
     },
     deliberations({ nodeId }, args, { driver }) {
       return findNodesByRelationshipAndLabel(driver, nodeId, 'HAS_DELIBERATION', 'Info');
     },
   },
-  Need: {
+  Tag: {
     fulfilledBy({ nodeId }, args, { driver }) {
       return findNodesByRelationshipAndLabel(driver, nodeId, 'FULFILLS', 'Responsibility', 'IN');
     },
   },
   Responsibility: {
     fulfills({ nodeId }, args, { driver }) {
-      return findNodeByRelationshipAndLabel(driver, nodeId, 'FULFILLS', 'Need');
+      return findNodeByRelationshipAndLabel(driver, nodeId, 'FULFILLS', 'Tag');
     },
   },
   Mutation: {
-    createNeed: combineResolvers(
+    createTag: combineResolvers(
       isAuthenticated,
       async (obj, { title }, { user, driver }) => {
-        const need = await createNeed(driver, { title }, user.email);
-        pubsub.publish(REALITY_CREATED, { realityCreated: need });
-        return need;
+        const tag = await createTag(driver, { title }, user.email);
+        pubsub.publish(REALITY_CREATED, { realityCreated: tag });
+        return tag;
       },
     ),
     createResponsibility: combineResolvers(
       isAuthenticated,
-      async (obj, { title, needId }, { user, driver }) => {
-        const responsibility = await createResponsibility(driver, { title, needId }, user.email);
+      async (obj, { title, tagId }, { user, driver }) => {
+        const responsibility = await createResponsibility(driver, { title, tagId }, user.email);
         pubsub.publish(REALITY_CREATED, { realityCreated: responsibility });
         return responsibility;
       },
@@ -149,22 +149,22 @@ const resolvers = {
       isAuthenticated,
       (obj, args, { user, driver }) => createViewer(driver, user.email),
     ),
-    updateNeed: combineResolvers(
+    updateTag: combineResolvers(
       isAuthenticated,
       async (obj, args, { driver, user }) => {
         const emailData = await getEmailData(driver, args);
-        const need = await updateReality(driver, args, user);
-        pubsub.publish(REALITY_UPDATED, { realityUpdated: need });
-        if (need && notify) {
+        const tag = await updateReality(driver, args, user);
+        pubsub.publish(REALITY_UPDATED, { realityUpdated: tag });
+        if (tag && notify) {
           sendUpdateMail(
             driver,
             user,
             args,
             emailData,
-            need,
+            tag,
           );
         }
-        return need;
+        return tag;
       },
     ),
     updateResponsibility: combineResolvers(
@@ -189,13 +189,13 @@ const resolvers = {
       isAuthenticated,
       (obj, { name }, { user, driver }) => updateViewerName(driver, { name }, user.email),
     ),
-    // TODO: Check if need is free of responsibilities and dependents before soft deleting
-    softDeleteNeed: combineResolvers(
+    // TODO: Check if tag is free of responsibilities and dependents before soft deleting
+    softDeleteTag: combineResolvers(
       isAuthenticated,
       async (obj, { nodeId }, { driver }) => {
-        const need = await softDeleteNode(driver, { nodeId });
-        pubsub.publish(REALITY_DELETED, { realityDeleted: need });
-        return need;
+        const tag = await softDeleteNode(driver, { nodeId });
+        pubsub.publish(REALITY_DELETED, { realityDeleted: tag });
+        return tag;
       },
     ),
     // TODO: Check if responsibility is free of dependents before soft deleting
@@ -207,21 +207,21 @@ const resolvers = {
         return responsibility;
       },
     ),
-    addNeedDependsOnNeeds: combineResolvers(
+    addTagRelatesToTags: combineResolvers(
       isAuthenticated,
-      (obj, { from, to }, { driver }) => addDependency(driver, { from, to }),
+      (obj, { from, to }, { driver }) => addInterrelation(driver, { from, to }),
     ),
-    addNeedDependsOnResponsibilities: combineResolvers(
+    addTagRelatesToResponsibilities: combineResolvers(
       isAuthenticated,
-      (obj, { from, to }, { driver }) => addDependency(driver, { from, to }),
+      (obj, { from, to }, { driver }) => addInterrelation(driver, { from, to }),
     ),
-    addResponsibilityDependsOnNeeds: combineResolvers(
+    addResponsibilityRelatesToTags: combineResolvers(
       isAuthenticated,
-      (obj, { from, to }, { driver }) => addDependency(driver, { from, to }),
+      (obj, { from, to }, { driver }) => addInterrelation(driver, { from, to }),
     ),
-    addResponsibilityDependsOnResponsibilities: combineResolvers(
+    addResponsibilityRelatesToResponsibilities: combineResolvers(
       isAuthenticated,
-      (obj, { from, to }, { driver }) => addDependency(driver, { from, to }),
+      (obj, { from, to }, { driver }) => addInterrelation(driver, { from, to }),
     ),
     addRealityHasDeliberation: combineResolvers(
       isAuthenticated,
@@ -234,21 +234,21 @@ const resolvers = {
       isAuthenticated,
       (obj, { from, to }, { driver }) => removeDeliberation(driver, { from, to }),
     ),
-    removeNeedDependsOnNeeds: combineResolvers(
+    removeTagRelatesToTags: combineResolvers(
       isAuthenticated,
-      (obj, { from, to }, { driver }) => removeDependency(driver, { from, to }),
+      (obj, { from, to }, { driver }) => removeInterrelation(driver, { from, to }),
     ),
-    removeNeedDependsOnResponsibilities: combineResolvers(
+    removeTagRelatesToResponsibilities: combineResolvers(
       isAuthenticated,
-      (obj, { from, to }, { driver }) => removeDependency(driver, { from, to }),
+      (obj, { from, to }, { driver }) => removeInterrelation(driver, { from, to }),
     ),
-    removeResponsibilityDependsOnNeeds: combineResolvers(
+    removeResponsibilityRelatesToTags: combineResolvers(
       isAuthenticated,
-      (obj, { from, to }, { driver }) => removeDependency(driver, { from, to }),
+      (obj, { from, to }, { driver }) => removeInterrelation(driver, { from, to }),
     ),
-    removeResponsibilityDependsOnResponsibilities: combineResolvers(
+    removeResponsibilityRelatesToResponsibilities: combineResolvers(
       isAuthenticated,
-      (obj, { from, to }, { driver }) => removeDependency(driver, { from, to }),
+      (obj, { from, to }, { driver }) => removeInterrelation(driver, { from, to }),
     ),
   },
 };
