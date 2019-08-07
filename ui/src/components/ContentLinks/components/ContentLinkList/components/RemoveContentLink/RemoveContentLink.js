@@ -7,15 +7,15 @@ import {
   Button,
 } from 'reactstrap';
 
-const REMOVE_REALITY_HAS_DELIBERATION = gql`
-  mutation RemoveDeliberation_removeRealityHasDeliberationMutation(
-    $from: _RealityInput!
-    $to: _InfoInput!
+const REMOVE_GRAPHTAG_IS_LINKED = gql`
+  mutation RemoveContentLink_removeGraphTagIsLinkedMutation(
+    $from: _GraphTagInput!
+    $to: _ContentInput!
   ) {
-    removeRealityHasDeliberation(from: $from, to: $to) {
+    removeGraphTagIsLinked(from: $from, to: $to) {
       from {
         nodeId
-        deliberations {
+        contentLinks {
           nodeId
         }
       }
@@ -23,18 +23,18 @@ const REMOVE_REALITY_HAS_DELIBERATION = gql`
   }
 `;
 
-const RemoveDeliberation = withRouter(({ match, url }) => (
-  <Mutation mutation={REMOVE_REALITY_HAS_DELIBERATION}>
-    {(removeDeliberation, { loading }) => (
+const RemoveContentLink = withRouter(({ match, url }) => (
+  <Mutation mutation={REMOVE_GRAPHTAG_IS_LINKED}>
+    {(removeContentLink, { loading }) => (
       <Button
         size="sm"
         color="danger"
         disabled={loading}
         onClick={(e) => {
           e.stopPropagation();
-          removeDeliberation({
+          removeContentLink({
             variables: {
-              from: { nodeId: match.params.responsibilityId || match.params.tagId },
+              from: { nodeId: match.params.tagId },
               to: { url },
             },
           });
@@ -46,26 +46,24 @@ const RemoveDeliberation = withRouter(({ match, url }) => (
   </Mutation>
 ));
 
-RemoveDeliberation.propTypes = {
+RemoveContentLink.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({
       tagId: PropTypes.string,
-      responsibilityId: PropTypes.string,
     }),
   }),
   nodeType: PropTypes.string,
   nodeId: PropTypes.string,
 };
 
-RemoveDeliberation.defaultProps = {
+RemoveContentLink.defaultProps = {
   match: {
     params: {
       tagId: undefined,
-      responsibilityId: undefined,
     },
   },
-  nodeType: 'Info',
+  nodeType: 'Content',
   nodeId: '',
 };
 
-export default RemoveDeliberation;
+export default RemoveContentLink;

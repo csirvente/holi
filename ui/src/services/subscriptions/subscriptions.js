@@ -2,64 +2,38 @@
 
 import gql from 'graphql-tag';
 
-export const REALITIES_CREATE_SUBSCRIPTION = gql`
-  subscription realityCreated {
-    realityCreated {
+export const GRAPHTAGS_CREATE_SUBSCRIPTION = gql`
+  subscription graphTagCreated {
+    graphTagCreated {
       title
       nodeId
-      realizer {
-        nodeId
-        name
+    }
+  }
+
+`;
+
+export const GRAPHTAGS_DELETE_SUBSCRIPTION = gql`
+  subscription graphTagDeleted {
+    graphTagDeleted {
+      nodeId
+      title
+      owner {
+        email
       }
-      ... on Tag {
-        fulfilledBy {
-          nodeId
-          title
-          realizer {
-            nodeId
-            name
-          }
-        }
-      }
-      ... on Responsibility {
-        fulfills {
-          nodeId
-        }
-      }
+      description
+      contentUrl
     }
   }
 `;
 
-export const REALITIES_DELETE_SUBSCRIPTION = gql`
-  subscription realityDeleted {
-    realityDeleted {
-      nodeId
-      title
-      guide {
-        email
-      }
-      realizer {
-        email
-      }
-      description
-      deliberationLink
-    }
-  }
-`;
-
-export const REALITIES_UPDATE_SUBSCRIPTION = gql`
-  subscription realityUpdated {
-    realityUpdated {
+export const GRAPHTAGS_UPDATE_SUBSCRIPTION = gql`
+  subscription graphTagUpdated {
+    graphTagUpdated {
       nodeId
       title
       description
-      deliberationLink
-      guide {
-        nodeId
-        email
-        name
-      }
-      realizer {
+      contentUrl
+      owner {
         nodeId
         email
         name
@@ -68,14 +42,7 @@ export const REALITIES_UPDATE_SUBSCRIPTION = gql`
         nodeId
         title
       }
-      relatesToResponsibilities {
-        nodeId
-        title
-        fulfills {
-          nodeId
-        }
-      }
-      deliberations {
+      contentLinks {
         nodeId
         url
         title

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { withRouter } from 'react-router-dom';
 import { Mutation } from 'react-apollo';
-import { GET_TAGS, GET_RESPONSIBILITIES } from '@/services/queries';
+import { GET_TAGS } from '@/services/queries';
 import DeleteNodeButton from './components/DeleteNodeButton';
 
 const SOFT_DELETE_TAG = gql`
@@ -11,18 +11,6 @@ const SOFT_DELETE_TAG = gql`
     softDeleteTag(nodeId: $nodeId) {
       nodeId
       deleted
-    }
-  }
-`;
-
-const SOFT_DELETE_RESPONSIBILITY = gql`
-  mutation DeleteNodeContainer_softDeleteResponsibility($nodeId: ID!) {
-    softDeleteResponsibility(nodeId: $nodeId) {
-      nodeId
-      deleted
-      fulfills {
-        nodeId
-      }
     }
   }
 `;
@@ -43,35 +31,19 @@ class DeleteNodeContainer extends Component {
   render() {
     return (
       <Mutation
-        mutation={this.props.nodeType === 'Tag' ? SOFT_DELETE_TAG : SOFT_DELETE_RESPONSIBILITY}
+        mutation={SOFT_DELETE_TAG}
         update={(cache, { data }) => {
           this.setState({ confirmationModalIsOpen: false });
           cache.writeData({ data: { showDetailedEditView: false } });
-          if (this.props.nodeType === 'Tag') {
-            const { tags } = cache.readQuery({ query: GET_TAGS });
+
+          const { tags } = cache.readQuery({ query: GET_TAGS });
             cache.writeQuery({
-              query: GET_TAGS,
-              data: {
-                tags: tags.filter(n => n.nodeId !== data.softDeleteTag.nodeId),
-              },
+            query: GET_TAGS,
+            data: {
+              tags: tags.filter(n => n.nodeId !== data.softDeleteTag.nodeId),
+            },
             });
-            this.props.history.push('/');
-          } else {
-            const tagId = data.softDeleteResponsibility.fulfills.nodeId;
-            const { responsibilities } = cache.readQuery({
-              query: GET_RESPONSIBILITIES,
-              variables: { tagId },
-            });
-            cache.writeQuery({
-              query: GET_RESPONSIBILITIES,
-              variables: { tagId },
-              data: {
-                responsibilities: responsibilities
-                  .filter(r => r.nodeId !== data.softDeleteResponsibility.nodeId),
-              },
-            });
-            this.props.history.push(`/${tagId}`);
-          }
+          this.props.history.push('/');
         }}
       >
         {(softDeleteNode, { loading, error }) => (

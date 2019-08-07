@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Col, Container, Row } from 'reactstrap';
 import Search from '@/components/Search';
 import TagsContainer from './components/TagsContainer';
-import ResponsibilitiesContainer from './components/ResponsibilitiesContainer';
 import DetailViewContainer from './components/DetailViewContainer';
 import DetailViewContainerGraph from './components/DetailViewContainerGraph';
 
@@ -26,7 +25,6 @@ const Home = () => (
           </Col>
           <Col lg="6">
             <DetailViewContainer />
-            <ResponsibilitiesContainer />
           </Col>
         </Row>
       </Col>

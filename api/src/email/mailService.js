@@ -1,6 +1,6 @@
 import sgMail from '@sendgrid/mail';
 import pug from 'pug';
-import { getPeopleTwoStepsFromReality } from '../graphql/connectors';
+import { getPeopleTwoStepsFromApp } from '../graphql/connectors';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const appUrl = process.env.APP_URL;
@@ -21,39 +21,35 @@ export const sendUpdateMail = async (
   driver,
   user,
   args,
-  oldRealityData,
-  updatedRealityData) => {
-  const realityData = {
-    description: (oldRealityData.description === updatedRealityData.description
+  oldHoliData,
+  updatedHoliData) => {
+  const HoliData = {
+    description: (oldHoliData.description === updatedHoliData.description
       ? false
-      : { new: updatedRealityData.description, old: oldRealityData.description }),
-    title: (oldRealityData.title === updatedRealityData.title
+      : { new: updatedHoliData.description, old: oldHoliData.description }),
+    title: (oldHoliData.title === updatedHoliData.title
       ? false
-      : { new: updatedRealityData.title, old: oldRealityData.title }),
-    guide: (oldRealityData.guideEmail === args.guideEmail
+      : { new: updatedHoliData.title, old: oldHoliData.title }),
+    owner: (oldHoliData.ownerEmail === args.ownerEmail
       ? false
-      : { new: args.guideEmail, old: oldRealityData.guideEmail }),
-    realizer: (oldRealityData.realizerEmail === args.realizerEmail
-      ? false
-      : { new: args.realizerEmail, old: oldRealityData.realizerEmail }),
+      : { new: args.ownerEmail, old: oldHoliData.ownerEmail }),
   };
-  if (Object.values(realityData).every(item => item === false)) {
+  if (Object.values(HoliData).every(item => item === false)) {
     return false;
   }
-  const template = pug.compileFile('src/email/templates/updateReality.pug');
+  const template = pug.compileFile('src/email/templates/updateHoli.pug');
   const emailHtml = template({
-    realityUrl: (oldRealityData.linkedTagId
-      ? `${appUrl}${oldRealityData.linkedTagId}/${updatedRealityData.nodeId}`
-      : `${appUrl}${updatedRealityData.nodeId}`
+    HoliUrl: (oldHoliData.linkedTagId
+      ? `${appUrl}${oldHoliData.linkedTagId}/${updatedHoliData.nodeId}`
+      : `${appUrl}${updatedHoliData.nodeId}`
     ),
-    realityName: oldRealityData.title,
-    description: realityData.description,
-    title: realityData.title,
-    guide: realityData.guide,
-    realizer: realityData.realizer,
+    HoliName: oldHoliData.title,
+    description: HoliData.description,
+    title: HoliData.title,
+    owner: HoliData.owner,
     userEmail: user.email,
   });
-  const people = await getPeopleTwoStepsFromReality(driver, args);
+  const people = await getPeopleTwoStepsFromApp(driver, args);
   const emails = people.map(person => (person.email))
     .filter(email => email !== user.email)
     .filter((v, i, a) => a.indexOf(v) === i);
@@ -61,10 +57,10 @@ export const sendUpdateMail = async (
     const message = {
       to: emails,
       from: {
-        email: process.env.FROM_EMAIL || 'realities@theborderland.se',
-        name: process.env.FROM_NAME || 'Realities',
+        email: process.env.FROM_EMAIL || 'team@holi.app',
+        name: process.env.FROM_NAME || 'Holi',
       },
-      subject: 'A reality has been updated',
+      subject: 'A tag has been updated',
       text: 'text missing for now',
       html: emailHtml,
     };

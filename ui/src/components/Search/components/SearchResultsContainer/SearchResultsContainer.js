@@ -10,18 +10,12 @@ import WrappedLoader from '@/components/WrappedLoader';
 import SearchResults from './components/SearchResults';
 
 const GET_SEARCH = gql`
-  query Search_searchTagsAndResponsibilities($term: String!) {
+  query Search_searchTags($term: String!) {
     tags(search: $term) {
       nodeId
       title
     }
-    responsibilities(search: $term) {
-      nodeId
-      title
-      fulfills {
-        nodeId
-      }
-    }
+
     persons(search: $term) {
       nodeId
       email
@@ -58,7 +52,6 @@ const SearchResultsContainer = withDebouncedProp('searchTerm', 250)(({
           if (error) return <CardBody>`Error! ${error.message}`</CardBody>;
           const searchResults = [
             ...(data.tags || []),
-            ...(data.responsibilities || []),
             ...(data.persons || []),
           ];
           if (searchResults.length === 0) return <CardBody>No results</CardBody>;

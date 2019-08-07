@@ -65,49 +65,27 @@ const EditDetailsForm = ({
     <Row>
       <Col md="6">
         <FormGroup>
-          <Label for="editDetailsGuide">
-            Guide
+          <Label for="editDetailsOwner">
+            Owner
           </Label>
           <TypeaheadInput
-            name="guide"
-            id="editDetailsGuide"
-            selectedItem={values.guide}
+            name="owner"
+            id="editDetailsOwner"
+            selectedItem={values.owner}
             itemToString={personToString}
             searchQuery={SEARCH_PERSON}
             queryDataToResultsArray={data => data.persons}
-            onChange={value => setFieldValue('guide', value)}
+            onChange={value => setFieldValue('owner', value)}
             onBlur={handleBlur}
             disabled={isSubmitting}
-            invalid={touched.guide && !!errors.guide}
+            invalid={touched.owner && !!errors.owner}
           />
           <FormFeedback
-            className={touched.guide && !!errors.guide ? 'd-block' : ''}
+            className={touched.owner && !!errors.owner ? 'd-block' : ''}
           >
-            {touched.guide && errors.guide}
+            {touched.owner && errors.owner}
           </FormFeedback>
         </FormGroup>
-      </Col>
-      <Col md="6">
-        <Label for="editDetailsRealizer">
-          Realizer
-        </Label>
-        <TypeaheadInput
-          name="realizer"
-          id="editDetailsRealizer"
-          selectedItem={values.realizer}
-          itemToString={personToString}
-          searchQuery={SEARCH_PERSON}
-          queryDataToResultsArray={data => data.persons}
-          onChange={value => setFieldValue('realizer', value)}
-          onBlur={handleBlur}
-          disabled={isSubmitting}
-          invalid={touched.realizer && !!errors.realizer}
-        />
-        <FormFeedback
-          className={touched.realizer && !!errors.realizer ? 'd-block' : ''}
-        >
-          {touched.realizer && errors.realizer}
-        </FormFeedback>
       </Col>
     </Row>
     <FormGroup>
@@ -150,17 +128,17 @@ EditDetailsForm.propTypes = {
   values: PropTypes.shape({
     title: PropTypes.string,
     description: PropTypes.string,
-    deliberationLink: PropTypes.string,
+    contentUrl: PropTypes.string,
   }),
   errors: PropTypes.shape({
     title: PropTypes.string,
     description: PropTypes.string,
-    deliberationLink: PropTypes.string,
+    contentUrl: PropTypes.string,
   }),
   touched: PropTypes.shape({
     title: PropTypes.bool,
     description: PropTypes.bool,
-    deliberationLink: PropTypes.bool,
+    contentUrl: PropTypes.bool,
   }),
   handleChange: PropTypes.func,
   handleBlur: PropTypes.func,
@@ -174,17 +152,17 @@ EditDetailsForm.defaultProps = {
   values: {
     title: '',
     description: '',
-    deliberationLink: '',
+    contentUrl: '',
   },
   errors: {
     title: '',
     description: '',
-    deliberationLink: '',
+    contentUrl: '',
   },
   touched: {
     title: false,
     description: false,
-    deliberationLink: false,
+    contentUrl: false,
   },
   handleChange: () => null,
   handleBlur: () => null,

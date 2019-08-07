@@ -1,16 +1,16 @@
 {
-  "name": "realities-app",
+  "name": "holi-app",
   "version": "0.1.0",
-  "description": "An app for tribal decentralised organisations.",
+  "description": "A knowledge management app.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/theborderland/realities.git"
+    "url": "https://github.com/csirvente/holi.git"
   },
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/theborderland/realities/issues"
+    "url": "https://github.com/csirvente/holi/issues"
   },
-  "homepage": "https://github.com/theborderland/realities#readme",
+  "homepage": "https://github.com/csirvente/holi#readme",
   "engines": {
     "npm": "5.5.1",
     "node": "8.9.1"

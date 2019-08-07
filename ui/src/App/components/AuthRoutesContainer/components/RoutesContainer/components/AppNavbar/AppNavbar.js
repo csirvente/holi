@@ -23,7 +23,7 @@ const StyledNavbarBrand = styled(NavbarBrand)`
   font-weight: bold;
 `;
 
-class RealitiesNavbar extends Component {
+class AppNavbar extends Component {
   constructor(props) {
     super(props);
 
@@ -87,7 +87,7 @@ class RealitiesNavbar extends Component {
   }
 }
 
-RealitiesNavbar.defaultProps = {
+AppNavbar.defaultProps = {
   auth: {
     isLoggedIn: false,
     email: 'example@example.com',
@@ -96,7 +96,7 @@ RealitiesNavbar.defaultProps = {
   },
 };
 
-RealitiesNavbar.propTypes = {
+AppNavbar.propTypes = {
   auth: PropTypes.shape({
     isLoggedIn: PropTypes.bool,
     email: PropTypes.string,
@@ -105,4 +105,4 @@ RealitiesNavbar.propTypes = {
   }),
 };
 
-export default withAuth(RealitiesNavbar);
+export default withAuth(AppNavbar);

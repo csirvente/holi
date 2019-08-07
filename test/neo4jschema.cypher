@@ -1,25 +1,21 @@
 CREATE
-  (Hampus)-[:REALIZES]->(PlacementMap),
-  (Hampus)-[:GUIDES]->(SafeBurn),
-  (Hampus)-[:GUIDES]->(FirstAid),
-  (Hampus)-[:GUIDES]->(Sanitation),
-  (Hampus)-[:GUIDES]->(Placement),
-  (Hampus)-[:GUIDES]->(SoundControl)
+  (Hampus)-[:OWNS]->(SafeBurn),
+  (Hampus)-[:OWNS]->(FirstAid),
+  (Hampus)-[:OWNS]->(Sanitation),
+  (Hampus)-[:OWNS]->(Placement),
+  (Hampus)-[:OWNS]->(SoundControl)
 CREATE
-  (Freya)-[:REALIZES]->(SanctuaryVolunteers),
-  (Freya)-[:GUIDES]->(TrackWeather),
-  (Freya)-[:GUIDES]->(BurnPerimeter)
+  (Freya)-[:OWNS]->(TrackWeather),
+  (Freya)-[:OWNS]->(BurnPerimeter)
 CREATE
-  (Vishnu)-[:GUIDES]->(DisasterPlan),
-  (Vishnu)-[:GUIDES]->(PortopottiePlacement),
-  (Vishnu)-[:GUIDES]->(BookPortopotties),
-  (Vishnu)-[:GUIDES]->(PlacementMap),
-  (Vishnu)-[:GUIDES]->(SanctuaryVolunteers)
+  (Vishnu)-[:OWNS]->(DisasterPlan),
+  (Vishnu)-[:OWNS]->(PortopottiePlacement),
+  (Vishnu)-[:OWNS]->(BookPortopotties),
+  (Vishnu)-[:OWNS]->(PlacementMap),
+  (Vishnu)-[:OWNS]->(SanctuaryVolunteers)
 CREATE
-  (Shiva)-[:REALIZES]->(DisasterPlan),
-  (Shiva)-[:REALIZES]->(FirstAid),
-  (Shiva)-[:GUIDES]->(SoundMeasurement),
-  (Shiva)-[:GUIDES]->(SoundCurfewPlanning)
+  (Shiva)-[:OWNS]->(SoundMeasurement),
+  (Shiva)-[:OWNS]->(SoundCurfewPlanning)
 
 CREATE
   (TrackWeather)-[:FULFILLS]->(SafeBurn),

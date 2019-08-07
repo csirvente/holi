@@ -1,1 +1,1 @@
-{"__schema":{"types":[{"kind":"INTERFACE","name":"Reality","possibleTypes":[{"name":"Tag"},{"name":"Responsibility"}]}]}}
+{"__schema":{"types":[{"kind":"INTERFACE","name":"GraphTag","possibleTypes":[{"name":"Tag"}]}]}}

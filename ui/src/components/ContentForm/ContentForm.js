@@ -16,7 +16,7 @@ const StyledFormGroup = styled(FormGroup)`
   margin-bottom: 0.5rem;
 `;
 
-const InfoForm = ({
+const ContentForm = ({
   inputName,
   placeholder,
   value,
@@ -49,7 +49,7 @@ const InfoForm = ({
   </Wrapper>
 );
 
-InfoForm.propTypes = {
+ContentForm.propTypes = {
   inputName: PropTypes.string,
   placeholder: PropTypes.string,
   value: PropTypes.string,
@@ -59,7 +59,7 @@ InfoForm.propTypes = {
   isSubmitting: PropTypes.bool,
 };
 
-InfoForm.defaultProps = {
+ContentForm.defaultProps = {
   inputName: '',
   placeholder: 'Enter text...',
   value: '',
@@ -69,4 +69,4 @@ InfoForm.defaultProps = {
   isSubmitting: false,
 };
 
-export default InfoForm;
+export default ContentForm;

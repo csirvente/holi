@@ -6,7 +6,7 @@ import { FaPencil, FaTimesCircle } from 'react-icons/lib/fa';
 import colors from '@/styles/colors';
 import IconButton from '@/components/IconButton';
 import Interrelations from '@/components/Interrelations';
-import Deliberations from '@/components/Deliberations';
+import ContentLinks from '@/components/ContentLinks';
 import EditDetailsContainer from './components/EditDetailsContainer';
 import DeleteNodeContainer from './components/DeleteNodeContainer';
 import DetailViewBody from './components/DetailViewBody';
@@ -45,9 +45,7 @@ const DetailView = ({
   <Card>
     <DetailViewCardHeader
       color={
-        node.__typename === 'Responsibility'
-          ? colors.responsibility
-          : colors.tag
+        colors.tag
       }
     >
       <HeaderText>Update {/* {node.__typename} */}</HeaderText>
@@ -66,11 +64,11 @@ const DetailView = ({
       <CardBody>
         <EditDetailsContainer node={node} />
         <Divider />
-        <Deliberations
+        <ContentLinks
           showAddRemove
           nodeType={node.__typename}
           nodeId={node.nodeId}
-          deliberations={node.deliberations}
+          contentLinks={node.contentLinks}
         />
         <Interrelations
           showAddRemove
@@ -78,7 +76,6 @@ const DetailView = ({
           nodeId={node.nodeId}
           interrelations={[
             ...(node.relatesToTags || []),
-            ...(node.relatesToResponsibilities || []),
           ]}
         />
         <Divider />
@@ -98,17 +95,12 @@ DetailView.propTypes = {
     nodeId: PropTypes.string,
     title: PropTypes.string,
     description: PropTypes.string,
-    deliberations: PropTypes.arrayOf(PropTypes.shape({
+    contentLinks: PropTypes.arrayOf(PropTypes.shape({
       __typename: PropTypes.string,
       nodeId: PropTypes.string,
       title: PropTypes.string,
     })),
-    guide: PropTypes.shape({
-      nodeId: PropTypes.string,
-      email: PropTypes.string,
-      name: PropTypes.string,
-    }),
-    realizer: PropTypes.shape({
+    owner: PropTypes.shape({
       nodeId: PropTypes.string,
       email: PropTypes.string,
       name: PropTypes.string,
@@ -117,14 +109,6 @@ DetailView.propTypes = {
       __typename: PropTypes.string,
       nodeId: PropTypes.string,
       title: PropTypes.string,
-    })),
-    relatesToResponsibilities: PropTypes.arrayOf(PropTypes.shape({
-      __typename: PropTypes.string,
-      nodeId: PropTypes.string,
-      title: PropTypes.string,
-      fulfills: PropTypes.shape({
-        nodeId: PropTypes.string,
-      }),
     })),
   }),
   showEdit: PropTypes.bool,
@@ -138,19 +122,13 @@ DetailView.defaultProps = {
     nodeId: '',
     title: '',
     description: '',
-    deliberations: [],
-    guide: {
-      nodeId: '',
-      email: '',
-      name: '',
-    },
-    realizer: {
+    contentLinks: [],
+    owner: {
       nodeId: '',
       email: '',
       name: '',
     },
     relatesToTags: [],
-    relatesToResponsibilities: [],
   },
   showEdit: false,
   isLoggedIn: false,

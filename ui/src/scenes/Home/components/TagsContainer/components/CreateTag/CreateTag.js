@@ -13,14 +13,7 @@ const CREATE_TAG = gql`
     createTag(title: $title) {
       nodeId
       title
-      fulfilledBy {
-        nodeId
-        title
-        realizer {
-          nodeId
-          name
-        }
-      }
+      
     }
   }
 `;

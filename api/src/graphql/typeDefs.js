@@ -6,9 +6,9 @@ const typeDefs = `
   }
 
   type Subscription {
-    realityCreated: Reality
-    realityDeleted: Reality
-    realityUpdated: Reality
+    graphTagCreated: GraphTag
+    graphTagDeleted: GraphTag
+    graphTagUpdated: GraphTag
   }
 
   type Query {
@@ -19,87 +19,52 @@ const typeDefs = `
     ): Person
     tags(search: String): [Tag]
     tag(nodeId: ID!): Tag
-    responsibilities(fulfillsTagId: ID, search: String): [Responsibility]
-    responsibility(nodeId: ID!): Responsibility
-    infos(search: String): [Info]
-    info(url: String!): [Info]
+    contents(search: String): [Content]
+    content(url: String!): [Content]
   }
 
   type Mutation {
     createTag(title: String!): Tag
-    createResponsibility(
-      title: String!
-      tagId: ID!
-    ): Responsibility 
+
     createViewer: Person
     updateTag(
       nodeId: ID!
       title: String!
-      guideEmail: String!
-      realizerEmail: String
+      ownerEmail: String!
       description: String
-      deliberationLink: String
+      contentUrl: String
     ): Tag
-    updateResponsibility(
-      nodeId: ID!
-      title: String!
-      guideEmail: String!
-      realizerEmail: String
-      description: String
-      deliberationLink: String
-    ): Responsibility
+
     updateViewerName(name: String!): Person
     softDeleteTag(nodeId: ID!): Tag
-    softDeleteResponsibility(nodeId: ID!): Responsibility
+
     addTagRelatesToTags(
       from: _TagInput!
       to: _TagInput!
     ): _TagRelatesToTagsPayload
-    addTagRelatesToResponsibilities(
-      from: _TagInput!
-      to: _ResponsibilityInput!
-    ): _TagRelatesToResponsibilitiesPayload
-    addResponsibilityRelatesToTags(
-      from: _ResponsibilityInput!
-      to: _TagInput!
-    ): _ResponsibilityRelatesToTagsPayload
-    addResponsibilityRelatesToResponsibilities(
-      from: _ResponsibilityInput!
-      to: _ResponsibilityInput!
-    ): _ResponsibilityRelatesToResponsibilitiesPayload
+
     removeTagRelatesToTags(
       from: _TagInput!
       to: _TagInput!
     ): _TagRelatesToTagsPayload
-    removeTagRelatesToResponsibilities(
-      from: _TagInput!
-      to: _ResponsibilityInput!
-    ): _TagRelatesToResponsibilitiesPayload
-    removeResponsibilityRelatesToTags(
-      from: _ResponsibilityInput!
-      to: _TagInput!
-    ): _ResponsibilityRelatesToTagsPayload
-    removeResponsibilityRelatesToResponsibilities(
-      from: _ResponsibilityInput!
-      to: _ResponsibilityInput!
-    ): _ResponsibilityRelatesToResponsibilitiesPayload
-    createInfo(
+
+    createContent(
       title: String
       url: String!
-    ): Info
-    updateInfo(
+    ): Content
+    updateContent(
       url: String!
       title: String!
-    ): Info
-    softDeleteInfo(url: String!): Info
-    addRealityHasDeliberation(
-      from: _RealityInput!
-      to: _InfoInput!
-    ): _RealityHasDeliberationPayload
-    removeRealityHasDeliberation(
-      from: _RealityInput!
-      to: _InfoInput!
-    ): _RealityHasDeliberationPayload
+    ): Content
+    softDeleteContent(url: String!): Content
+    addGraphTagIsLinked(
+      from: _GraphTagInput!
+      to: _ContentInput!
+    ): _GraphTagIsLinkedPayload
+    removeGraphTagIsLinked(
+      from: _GraphTagInput!
+      to: _ContentInput!
+    ): _GraphTagIsLinkedPayload
   }
 
   type Person {
@@ -107,67 +72,40 @@ const typeDefs = `
     name: String
     email: String!
     created: String
-    guidesTags: [Tag]
-    realizesTags: [Tag]
-    guidesResponsibilities: [Responsibility]
-    realizesResponsibilities: [Responsibility]
+    ownsTags: [Tag]
   }
 
-  interface Reality {
+  interface GraphTag {
     nodeId: ID!
     title: String!
     description: String
-    deliberationLink: String
+    contentUrl: String
     created: String
     deleted: String
-    guide: Person
-    realizer: Person
+    owner: Person
     relatesToTags: [Tag]
-    relatesToResponsibilities: [Responsibility]
     tagsThatRelateToThis: [Tag]
-    responsibilitiesThatRelateToThis: [Responsibility]
-    deliberations: [Info]
+    contentLinks: [Content]
   }
 
-  type Tag implements Reality {
+  type Tag implements GraphTag {
     nodeId: ID!
     title: String!
     description: String
-    deliberationLink: String
+    contentUrl: String
     created: String
     deleted: String
-    guide: Person
-    realizer: Person
-    fulfilledBy: [Responsibility]
+    owner: Person
     relatesToTags: [Tag]
-    relatesToResponsibilities: [Responsibility]
     tagsThatRelateToThis: [Tag]
-    responsibilitiesThatRelateToThis: [Responsibility]
-    deliberations: [Info]
+    contentLinks: [Content]
   }
 
-  type Responsibility implements Reality {
-    nodeId: ID!
-    title: String!
-    description: String
-    deliberationLink: String
-    created: String
-    deleted: String
-    guide: Person
-    realizer: Person
-    fulfills: Tag
-    relatesToTags: [Tag]
-    relatesToResponsibilities: [Responsibility]
-    tagsThatRelateToThis: [Tag]
-    responsibilitiesThatRelateToThis: [Responsibility]
-    deliberations: [Info]
-  }
-
-  type Info {
+  type Content {
     nodeId: ID!
     url: String!
     title: String
-    isDeliberationFor: [Reality]
+    isLinkFor: [GraphTag]
     created: String
     deleted: String
   }
@@ -176,16 +114,13 @@ const typeDefs = `
     nodeId: ID!
   }
 
-  input _ResponsibilityInput {
+  input _GraphTagInput {
     nodeId: ID!
   }
 
-  input _RealityInput {
-    nodeId: ID!
-  }
-
-  input _InfoInput {
+  input _ContentInput {
     url: String!
+    title: String
   }
 
   type _TagRelatesToTagsPayload {
@@ -193,24 +128,9 @@ const typeDefs = `
     to: Tag
   }
 
-  type _TagRelatesToResponsibilitiesPayload {
-    from: Tag
-    to: Responsibility
-  }
-
-  type _ResponsibilityRelatesToTagsPayload {
-    from: Responsibility
-    to: Tag
-  }
-
-  type _ResponsibilityRelatesToResponsibilitiesPayload {
-    from: Responsibility
-    to: Responsibility
-  }
-
-  type _RealityHasDeliberationPayload {
-    from: Reality
-    to: Info
+  type _GraphTagIsLinkedPayload {
+    from: GraphTag
+    to: Content
   }
 `;
 

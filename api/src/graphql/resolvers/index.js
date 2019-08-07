@@ -9,17 +9,16 @@ import {
   findNodesByRelationshipAndLabel,
   findNodeByRelationshipAndLabel,
   createTag,
-  createResponsibility,
   createViewer,
-  updateReality,
+  updateGraphTag,
   updateViewerName,
   softDeleteNode,
   addInterrelation,
   removeInterrelation,
-  addRealityHasDeliberation,
-  removeDeliberation,
+  addGraphTagIsLinked,
+  removeContentLink,
   searchPersons,
-  searchRealities,
+  searchApp,
   getEmailData,
 } from '../connectors';
 import { isAuthenticated } from '../authorization';
@@ -29,16 +28,16 @@ const notify = (process.env.EMAIL_NOTIFICATIONS === 'enabled');
 
 const pubsub = new PubSub();
 
-const REALITY_CREATED = 'REALITY_CREATED';
-const REALITY_DELETED = 'REALITY_DELETED';
-const REALITY_UPDATED = 'REALITY_UPDATED';
+const GRAPHTAG_CREATED = 'GRAPHTAG_CREATED';
+const GRAPHTAG_DELETED = 'GRAPHTAG_DELETED';
+const GRAPHTAG_UPDATED = 'GRAPHTAG_UPDATED';
 
 const resolvers = {
   // root entry point to GraphQL service
   Subscription: {
-    realityCreated: { subscribe: () => pubsub.asyncIterator([REALITY_CREATED]) },
-    realityDeleted: { subscribe: () => pubsub.asyncIterator([REALITY_DELETED]) },
-    realityUpdated: { subscribe: () => pubsub.asyncIterator([REALITY_UPDATED]) },
+    graphTagCreated: { subscribe: () => pubsub.asyncIterator([GRAPHTAG_CREATED]) },
+    graphTagDeleted: { subscribe: () => pubsub.asyncIterator([GRAPHTAG_DELETED]) },
+    graphTagUpdated: { subscribe: () => pubsub.asyncIterator([GRAPHTAG_UPDATED]) },
   },
   Query: {
     persons(obj, { search }, { driver }) {
@@ -54,39 +53,22 @@ const resolvers = {
       return new Error(errorMessage);
     },
     tags(obj, { search }, { driver }) {
-      if (search) return searchRealities(driver, 'Tag', search);
+      if (search) return searchApp(driver, 'Tag', search);
       return findNodesByLabel(driver, 'Tag');
     },
     tag(obj, { nodeId }, { driver }) {
       return findNodeByLabelAndId(driver, 'Tag', nodeId);
-    },
-    responsibilities(obj, { search, fulfillsTagId }, { driver }) {
-      if (search) return searchRealities(driver, 'Responsibility', search);
-      if (fulfillsTagId) return findNodesByRelationshipAndLabel(driver, fulfillsTagId, 'FULFILLS', 'Responsibility', 'IN');
-      return findNodesByLabel(driver, 'Responsibility');
-    },
-    responsibility(obj, { nodeId }, { driver }) {
-      return findNodeByLabelAndId(driver, 'Responsibility', nodeId);
     },
   },
   Person: {
     created({ created }) {
       return created.toString();
     },
-    guidesTags({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'GUIDES', 'Tag');
-    },
-    realizesTags({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'REALIZES', 'Tag');
-    },
-    guidesResponsibilities({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'GUIDES', 'Responsibility');
-    },
-    realizesResponsibilities({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'REALIZES', 'Responsibility');
+    ownsTags({ nodeId }, args, { driver }) {
+      return findNodesByRelationshipAndLabel(driver, nodeId, 'OWNS', 'Tag');
     },
   },
-  Reality: {
+  GraphTag: {
     __resolveType(obj) {
       return obj.__label;
     },
@@ -96,53 +78,29 @@ const resolvers = {
     deleted({ deleted }) {
       return deleted.toString();
     },
-    guide({ nodeId }, args, { driver }) {
-      return findNodeByRelationshipAndLabel(driver, nodeId, 'GUIDES', 'Person', 'IN');
-    },
-    realizer({ nodeId }, args, { driver }) {
-      return findNodeByRelationshipAndLabel(driver, nodeId, 'REALIZES', 'Person', 'IN');
+    owner({ nodeId }, args, { driver }) {
+      return findNodeByRelationshipAndLabel(driver, nodeId, 'OWNS', 'Person', 'IN');
     },
     relatesToTags({ nodeId }, args, { driver }) {
       return findNodesByRelationshipAndLabel(driver, nodeId, 'RELATES_TO', 'Tag');
     },
-    relatesToResponsibilities({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'RELATES_TO', 'Responsibility');
-    },
     tagsThatRelateToThis({ nodeId }, args, { driver }) {
       return findNodesByRelationshipAndLabel(driver, nodeId, 'RELATES_TO', 'Tag', 'IN');
     },
-    responsibilitiesThatRelateToThis({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'RELATES_TO', 'Responsibility', 'IN');
-    },
-    deliberations({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'HAS_DELIBERATION', 'Info');
+    contentLinks({ nodeId }, args, { driver }) {
+      return findNodesByRelationshipAndLabel(driver, nodeId, 'IS_LINKED', 'Content');
     },
   },
   Tag: {
-    fulfilledBy({ nodeId }, args, { driver }) {
-      return findNodesByRelationshipAndLabel(driver, nodeId, 'FULFILLS', 'Responsibility', 'IN');
-    },
   },
-  Responsibility: {
-    fulfills({ nodeId }, args, { driver }) {
-      return findNodeByRelationshipAndLabel(driver, nodeId, 'FULFILLS', 'Tag');
-    },
-  },
+
   Mutation: {
     createTag: combineResolvers(
       isAuthenticated,
       async (obj, { title }, { user, driver }) => {
         const tag = await createTag(driver, { title }, user.email);
-        pubsub.publish(REALITY_CREATED, { realityCreated: tag });
+        pubsub.publish(GRAPHTAG_CREATED, { graphTagCreated: tag });
         return tag;
-      },
-    ),
-    createResponsibility: combineResolvers(
-      isAuthenticated,
-      async (obj, { title, tagId }, { user, driver }) => {
-        const responsibility = await createResponsibility(driver, { title, tagId }, user.email);
-        pubsub.publish(REALITY_CREATED, { realityCreated: responsibility });
-        return responsibility;
       },
     ),
     createViewer: combineResolvers(
@@ -153,8 +111,8 @@ const resolvers = {
       isAuthenticated,
       async (obj, args, { driver, user }) => {
         const emailData = await getEmailData(driver, args);
-        const tag = await updateReality(driver, args, user);
-        pubsub.publish(REALITY_UPDATED, { realityUpdated: tag });
+        const tag = await updateGraphTag(driver, args, user);
+        pubsub.publish(GRAPHTAG_UPDATED, { graphTagUpdated: tag });
         if (tag && notify) {
           sendUpdateMail(
             driver,
@@ -167,86 +125,35 @@ const resolvers = {
         return tag;
       },
     ),
-    updateResponsibility: combineResolvers(
-      isAuthenticated,
-      async (obj, args, { driver, user }) => {
-        const emailData = await getEmailData(driver, args);
-        const responsibility = await updateReality(driver, args);
-        pubsub.publish(REALITY_UPDATED, { realityUpdated: responsibility });
-        if (responsibility && notify) {
-          sendUpdateMail(
-            driver,
-            user,
-            args,
-            emailData,
-            responsibility,
-          );
-        }
-        return responsibility;
-      },
-    ),
     updateViewerName: combineResolvers(
       isAuthenticated,
       (obj, { name }, { user, driver }) => updateViewerName(driver, { name }, user.email),
     ),
-    // TODO: Check if tag is free of responsibilities and dependents before soft deleting
     softDeleteTag: combineResolvers(
       isAuthenticated,
       async (obj, { nodeId }, { driver }) => {
         const tag = await softDeleteNode(driver, { nodeId });
-        pubsub.publish(REALITY_DELETED, { realityDeleted: tag });
+        pubsub.publish(GRAPHTAG_DELETED, { graphTagDeleted: tag });
         return tag;
       },
     ),
-    // TODO: Check if responsibility is free of dependents before soft deleting
-    softDeleteResponsibility: combineResolvers(
-      isAuthenticated,
-      async (obj, { nodeId }, { driver }) => {
-        const responsibility = await softDeleteNode(driver, { nodeId });
-        pubsub.publish(REALITY_DELETED, { realityDeleted: responsibility });
-        return responsibility;
-      },
-    ),
+
     addTagRelatesToTags: combineResolvers(
       isAuthenticated,
       (obj, { from, to }, { driver }) => addInterrelation(driver, { from, to }),
     ),
-    addTagRelatesToResponsibilities: combineResolvers(
-      isAuthenticated,
-      (obj, { from, to }, { driver }) => addInterrelation(driver, { from, to }),
-    ),
-    addResponsibilityRelatesToTags: combineResolvers(
-      isAuthenticated,
-      (obj, { from, to }, { driver }) => addInterrelation(driver, { from, to }),
-    ),
-    addResponsibilityRelatesToResponsibilities: combineResolvers(
-      isAuthenticated,
-      (obj, { from, to }, { driver }) => addInterrelation(driver, { from, to }),
-    ),
-    addRealityHasDeliberation: combineResolvers(
+    addGraphTagIsLinked: combineResolvers(
       isAuthenticated,
       (obj, { from, to }, { driver }) => {
-        const normalizedTo = { url: NormalizeUrl(to.url, { stripHash: true }) };
-        return addRealityHasDeliberation(driver, { from, to: normalizedTo });
+        const normalizedTo = { url: NormalizeUrl(to.url, { stripHash: true }), title: to.title };
+        return addGraphTagIsLinked(driver, { from, to: normalizedTo });
       },
     ),
-    removeRealityHasDeliberation: combineResolvers(
+    removeGraphTagIsLinked: combineResolvers(
       isAuthenticated,
-      (obj, { from, to }, { driver }) => removeDeliberation(driver, { from, to }),
+      (obj, { from, to }, { driver }) => removeContentLink(driver, { from, to }),
     ),
     removeTagRelatesToTags: combineResolvers(
-      isAuthenticated,
-      (obj, { from, to }, { driver }) => removeInterrelation(driver, { from, to }),
-    ),
-    removeTagRelatesToResponsibilities: combineResolvers(
-      isAuthenticated,
-      (obj, { from, to }, { driver }) => removeInterrelation(driver, { from, to }),
-    ),
-    removeResponsibilityRelatesToTags: combineResolvers(
-      isAuthenticated,
-      (obj, { from, to }, { driver }) => removeInterrelation(driver, { from, to }),
-    ),
-    removeResponsibilityRelatesToResponsibilities: combineResolvers(
       isAuthenticated,
       (obj, { from, to }, { driver }) => removeInterrelation(driver, { from, to }),
     ),

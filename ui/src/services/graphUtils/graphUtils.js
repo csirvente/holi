@@ -3,7 +3,6 @@ import colors from '@/styles/colors';
 
 const colorCollection = {
   Tag: colors.tag,
-  Responsibility: colors.responsibility,
   Person: colors.person,
 };
 
@@ -69,14 +68,10 @@ function getSubGraph(originNode = {}) {
     edges: [],
   };
 
-  pushNode(graph, originNode, originNode.guide, 'Guides', 'OUT');
-  pushNode(graph, originNode, originNode.realizer, 'Realizes', 'OUT');
-  pushNode(graph, originNode, originNode.fulfills, 'Fulfills', 'IN');
+  pushNode(graph, originNode, originNode.owner, 'Owns', 'OUT');
   pushNode(graph, originNode, originNode.relatesToTags, 'Relates to', 'IN');
-  pushNode(graph, originNode, originNode.relatesToResponsibilities, 'Relates to', 'IN');
-  pushNode(graph, originNode, originNode.fulfilledBy, 'Fulfills', 'OUT');
   pushNode(graph, originNode, originNode.tagsThatRelateToThis, 'Relates to', 'OUT');
-  pushNode(graph, originNode, originNode.responsibilitiesThatRelateToThis, 'Relates to', 'OUT');
+  pushNode(graph, originNode, originNode.contentLinks, 'Is linked to', 'OUT');
 
   return graph;
 }
@@ -96,35 +91,18 @@ function getPersonGraph(originNode = {}) {
     edges: [],
   };
 
-  function pushNodesToSubsequentNodes(userNodeId, nodes, role, relation) {
+  /*  function pushNodesToSubsequentNodes(userNodeId, nodes, role, relation) {
     nodes.forEach((node) => {
       // The following check is to prevent duplicate edges between a
-      // tag/responsibility and a person.
+      // tag and a person.
       if (node[role] && node[role].nodeId !== userNodeId) {
         pushNode(graph, node, node[role], relation, 'IN');
       }
-      // If node is a responsibility, add node for the tag it fulfills and
-      // for every responsibility that relate to it.
-      if (node.__typename === 'Responsibility') {
-        pushNode(graph, node, node.fulfills, 'Fulfills', 'IN');
-        node.relatesToResponsibilities.forEach((responsibility) => {
-          pushNode(graph, node, responsibility, 'Relates to', 'IN');
-        });
-      }
     });
-  }
+  } */
 
-  pushNode(graph, originNode, originNode.guidesTags, 'Guides', 'IN');
-  pushNodesToSubsequentNodes(originNode.nodeId, originNode.guidesTags, 'realizer', 'Realizes');
-
-  pushNode(graph, originNode, originNode.realizesTags, 'Realizes', 'IN');
-  pushNodesToSubsequentNodes(originNode.nodeId, originNode.realizesTags, 'guide', 'Guides');
-
-  pushNode(graph, originNode, originNode.guidesResponsibilities, 'Guides', 'IN');
-  pushNodesToSubsequentNodes(originNode.nodeId, originNode.guidesResponsibilities, 'realizer', 'Realizes');
-
-  pushNode(graph, originNode, originNode.realizesResponsibilities, 'Realizes', 'IN');
-  pushNodesToSubsequentNodes(originNode.nodeId, originNode.realizesResponsibilities, 'guide', 'Guides');
+  pushNode(graph, originNode, originNode.ownsTags, 'Owns', 'IN');
+  // pushNodesToSubsequentNodes(originNode.nodeId, originNode.ownsTags, 'owner', 'Owns');
 
   return graph;
 }

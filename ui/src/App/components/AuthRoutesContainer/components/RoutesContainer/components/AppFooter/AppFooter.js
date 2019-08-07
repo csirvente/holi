@@ -11,10 +11,10 @@ const StyledFooter = styled.footer`
   text-align: center;
 `;
 
-const RealitiesFooter = () => (
+const AppFooter = () => (
   <StyledFooter className="text-muted">
     Spring knowledge - Get your world organized.
   </StyledFooter>
 );
 
-export default RealitiesFooter;
+export default AppFooter;

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { ListGroup, ListGroupItem } from 'reactstrap';
 import TypeBadge from '@/components/TypeBadge';
-import RemoveDeliberation from './components/RemoveDeliberation';
+import RemoveContentLink from './components/RemoveContentLink';
 
 const StyledListGroup = styled(ListGroup)`
   margin-bottom: 2em;
@@ -20,14 +20,14 @@ const RemoveWrapper = styled.span`
   right: 0.54em;
 `;
 
-const DeliberationList = ({ deliberations, showRemove }) => {
+const ContentLinkList = ({ contentLinks, showRemove }) => {
   const handleClick = (url) => {
     const win = window.open(url, '_blank');
     win.focus();
   };
   return (
     <StyledListGroup>
-      {deliberations.map(({
+      {contentLinks.map(({
         node: {
           __typename,
           nodeId,
@@ -46,7 +46,7 @@ const DeliberationList = ({ deliberations, showRemove }) => {
             {title || url}
             {showRemove && (
               <RemoveWrapper>
-                <RemoveDeliberation nodeType={__typename} nodeId={nodeId} url={url} />
+                <RemoveContentLink nodeType={__typename} nodeId={nodeId} url={url} />
               </RemoveWrapper>
             )}
           </StyledListGroupItem>
@@ -55,8 +55,8 @@ const DeliberationList = ({ deliberations, showRemove }) => {
   );
 };
 
-DeliberationList.propTypes = {
-  deliberations: PropTypes.arrayOf(PropTypes.shape({
+ContentLinkList.propTypes = {
+  contentLinks: PropTypes.arrayOf(PropTypes.shape({
     node: PropTypes.shape({
       __typename: PropTypes.string,
       nodeId: PropTypes.string,
@@ -67,9 +67,9 @@ DeliberationList.propTypes = {
   showRemove: PropTypes.bool,
 };
 
-DeliberationList.defaultProps = {
-  deliberations: [],
+ContentLinkList.defaultProps = {
+  contentLinks: [],
   showRemove: false,
 };
 
-export default DeliberationList;
+export default ContentLinkList;

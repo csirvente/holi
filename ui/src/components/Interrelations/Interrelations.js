@@ -22,7 +22,7 @@ const Interrelations = withAuth(withRouter(({
         node: dep,
         onClick: () => history.push(dep.__typename === 'Tag'
           ? `/${dep.nodeId}`
-          : `/${dep.fulfills.nodeId}/${dep.nodeId}`),
+          : `/${dep.nodeId}`),
       }))}
       showRemove={auth.isLoggedIn && showAddRemove}
     />
@@ -42,9 +42,7 @@ Interrelations.propTypes = {
     __typename: PropTypes.string,
     nodeId: PropTypes.string,
     title: PropTypes.string,
-    fulfills: PropTypes.shape({
-      nodeId: PropTypes.string,
-    }),
+
   })),
   showAddRemove: PropTypes.bool,
 };

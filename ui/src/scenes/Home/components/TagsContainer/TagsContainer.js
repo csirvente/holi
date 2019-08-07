@@ -6,9 +6,9 @@ import { withRouter, Redirect } from 'react-router-dom';
 import { Query } from 'react-apollo';
 import { GET_TAGS } from '@/services/queries';
 import {
-  REALITIES_CREATE_SUBSCRIPTION,
-  REALITIES_DELETE_SUBSCRIPTION,
-  REALITIES_UPDATE_SUBSCRIPTION,
+  GRAPHTAGS_CREATE_SUBSCRIPTION,
+  GRAPHTAGS_DELETE_SUBSCRIPTION,
+  GRAPHTAGS_UPDATE_SUBSCRIPTION,
 } from '@/services/subscriptions';
 import withAuth from '@/components/withAuth';
 import ListHeader from '@/components/ListHeader';
@@ -28,14 +28,13 @@ const TagsContainer = withAuth(withRouter(({ auth, match }) => (
     {({ data: localData, client }) => (
       <div>
         <ListHeader
-          text="Pin new cool links"
+          text="Add new tags"
           color={colors.tag}
           showButton={auth.isLoggedIn}
           onButtonClick={() =>
               client.writeData({
                 data: {
                   showCreateTag: !localData.showCreateTag,
-                  showCreateResponsibility: false,
                 },
               })
             }
@@ -63,40 +62,40 @@ const TagsContainer = withAuth(withRouter(({ auth, match }) => (
                   selectedTagId={match.params.tagId}
                   subscribeToTagsEvents={() => {
                     subscribeToMore({
-                      document: REALITIES_CREATE_SUBSCRIPTION,
+                      document: GRAPHTAGS_CREATE_SUBSCRIPTION,
                       updateQuery: (prev, { subscriptionData }) => {
                         if (!subscriptionData.data) return prev;
-                        const { realityCreated } = subscriptionData.data;
+                        const { graphTagCreated } = subscriptionData.data;
 
-                        if (realityCreated.__typename !== 'Tag') return prev;
+                        if (graphTagCreated.__typename !== 'Tag') return prev;
 
                         const alreadyExists =
-  prev.tags.filter(tag => tag.nodeId === realityCreated.nodeId).length > 0;
+  prev.tags.filter(tag => tag.nodeId === graphTagCreated.nodeId).length > 0;
 
                         if (alreadyExists) return prev;
-                        return { tags: [realityCreated, ...prev.tags] };
+                        return { tags: [graphTagCreated, ...prev.tags] };
                       },
                     });
                     subscribeToMore({
-                      document: REALITIES_DELETE_SUBSCRIPTION,
+                      document: GRAPHTAGS_DELETE_SUBSCRIPTION,
                       updateQuery: (prev, { subscriptionData }) => {
                         if (!subscriptionData.data) return prev;
-                        const { realityDeleted } = subscriptionData.data;
+                        const { graphTagDeleted } = subscriptionData.data;
                         return {
-                          tags: prev.tags.filter(item => item.nodeId !== realityDeleted.nodeId),
+                          tags: prev.tags.filter(item => item.nodeId !== graphTagDeleted.nodeId),
                         };
                       },
                     });
                     subscribeToMore({
-                      document: REALITIES_UPDATE_SUBSCRIPTION,
+                      document: GRAPHTAGS_UPDATE_SUBSCRIPTION,
                       updateQuery: (prev, { subscriptionData }) => {
                         if (!subscriptionData.data) return prev;
 
-                        const { realityUpdated } = subscriptionData.data;
+                        const { graphTagUpdated } = subscriptionData.data;
 
                         return {
                           tags: prev.tags.map((item) => {
-                            if (item.nodeId === realityUpdated.nodeId) { return realityUpdated; }
+                            if (item.nodeId === graphTagUpdated.nodeId) { return graphTagUpdated; }
                             return item;
                           }),
                         };

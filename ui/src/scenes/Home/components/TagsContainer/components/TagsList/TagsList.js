@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { withRouter } from 'react-router-dom';
 import { ListGroup, ListGroupItem } from 'reactstrap';
 import colors from '@/styles/colors';
-import RealizersMissingIcon from '@/components/RealizersMissingIcon';
 
 const TagsListGroup = styled(ListGroup)`
   margin-bottom: 1rem;
@@ -22,26 +21,6 @@ const TagsListGroupItem = styled(ListGroupItem)`
     color: white;
   }
 `;
-
-const RightMarginSpan = styled.span`
-  margin-right: 10px;
-`;
-
-const renderMissingRealizersAmount = (tag) => {
-  let realizersMissing = [];
-  if (tag.fulfilledBy) {
-    realizersMissing = tag.fulfilledBy.filter(resp => !resp.realizer);
-  }
-
-  if (realizersMissing.length > 0) {
-    return (
-      <div>
-        <RightMarginSpan>{realizersMissing.length}x</RightMarginSpan> <RealizersMissingIcon />
-      </div>
-    );
-  }
-  return '';
-};
 
 class TagsList extends Component {
   componentDidMount() {
@@ -63,7 +42,6 @@ class TagsList extends Component {
               onClick={() => history.push(`/${tag.nodeId}`)}
             >
               {tag.title}
-              {renderMissingRealizersAmount(tag)}
             </TagsListGroupItem>
           ))}
         </TagsListGroup>

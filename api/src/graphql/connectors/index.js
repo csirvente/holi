@@ -131,69 +131,46 @@ export function createTag(driver, { title }, userEmail) {
   const query = `
     MATCH (person:Person {email:{email}})
     CREATE (tag:Tag {title:{title}, nodeId:{tagId}, created:timestamp()})
-    CREATE (person)-[:GUIDES]->(tag)
-    CREATE (person)-[:REALIZES]->(tag)
+    CREATE (person)-[:OWNS]->(tag)
     RETURN tag
   `;
   return runQueryAndGetRecord(driver.session(), query, queryParams);
 }
 
-export function createResponsibility(driver, { title, tagId }, userEmail) {
+export function addGraphTagIsLinked(driver, { from, to }) {
   const queryParams = {
-    title,
-    tagId,
-    email: userEmail,
-    responsibilityId: uuidv4(),
+    graphTagId: from.nodeId,
+    contentUrl: to.url,
+    contentTitle: to.title,
+    contentId: uuidv4(),
   };
-  // Use cypher FOREACH hack to only set nodeId for person if it isn't already set
+  // Use cypher FOREACH hack to only set nodeId for content if it isn't already set
   const query = `
-    MATCH (tag:Tag {nodeId: {tagId}})
-    WITH tag
-    MATCH (person:Person {email:{email}})
-    CREATE (resp:Responsibility {
-      title:{title},
-      nodeId:{responsibilityId},
-      created:timestamp()
-    })-[r:FULFILLS]->(tag)
-    CREATE (person)-[:GUIDES]->(resp)
-    RETURN resp
-  `;
-  return runQueryAndGetRecord(driver.session(), query, queryParams);
-}
-
-export function addRealityHasDeliberation(driver, { from, to }) {
-  const queryParams = {
-    realityId: from.nodeId,
-    infoUrl: to.url,
-    infoId: uuidv4(),
-  };
-  // Use cypher FOREACH hack to only set nodeId for info if it isn't already set
-  const query = `
-    MATCH (reality {nodeId: {realityId}})
-    WITH reality
-    MERGE (info:Info {url: {infoUrl}})
-    FOREACH (doThis IN CASE WHEN not(exists(info.nodeId)) THEN [1] ELSE [] END |
-      SET info += {nodeId:{infoId}, created:timestamp()})
-    WITH reality, info
-    MERGE (reality)-[:HAS_DELIBERATION]->(info)
-    RETURN reality as from, info as to
+    MATCH (graphTag {nodeId: {graphTagId}})
+    WITH graphTag
+    MERGE (content:Content {url: {contentUrl}, title: {contentTitle}})
+    FOREACH (doThis IN CASE WHEN not(exists(content.nodeId)) THEN [1] ELSE [] END |
+      SET content += {nodeId:{contentId}, created:timestamp()})
+    WITH graphTag, content
+    MERGE (graphTag)-[:IS_LINKED]->(content)
+    RETURN graphTag as from, content as to
   `;
   return runQueryAndGetRecordWithFields(driver.session(), query, queryParams);
 }
 
-export function createInfo(driver, { title }, infoUrl) {
+export function createContent(driver, { title }, contentUrl) {
   const queryParams = {
     title,
-    url: infoUrl,
-    infoId: uuidv4(),
+    url: contentUrl,
+    contentId: uuidv4(),
   };
-  // Use cypher FOREACH hack to only set nodeId for info if it isn't already set
+  // Use cypher FOREACH hack to only set nodeId for content if it isn't already set
   const query = `
-    MERGE (info:Info {url: {url}})
-    FOREACH (doThis IN CASE WHEN not(exists(info.nodeId)) THEN [1] ELSE [] END |
-      SET info += {nodeId:{infoId}, created:timestamp(), title: {title}})
-    SET info.title = {title}
-    RETURN info
+    MERGE (content:Content {url: {url}, title: {title}})
+    FOREACH (doThis IN CASE WHEN not(exists(content.nodeId)) THEN [1] ELSE [] END |
+      SET content += {nodeId:{contentId}, created:timestamp(), title: {title}})
+    SET content.title = {title}
+    RETURN content
   `;
   return runQueryAndGetRecord(driver.session(), query, queryParams);
 }
@@ -213,25 +190,22 @@ export function createViewer(driver, userEmail) {
   return runQueryAndGetRecord(driver.session(), query, queryParams);
 }
 
-export function updateReality(driver, args) {
-  // Use cypher FOREACH hack to only set realizer
+export function updateGraphTag(driver, args) {
   // if the Person node could be found
   const query = `
-    MATCH (reality {nodeId: {nodeId}})
-    MATCH (:Person)-[g:GUIDES]->(reality)
-    MATCH (guide:Person {email: {guideEmail}})
-    OPTIONAL MATCH (:Person)-[r:REALIZES]->(reality)
-    OPTIONAL MATCH (realizer:Person {email: {realizerEmail}})
-    SET reality += {
+    MATCH (graphTag {nodeId: {nodeId}})
+    MATCH (:Person)-[g:OWNS]->(graphTag)
+    MATCH (owner:Person {email: {ownerEmail}})
+    
+    SET graphTag += {
       title: {title},
       description: {description},
-      deliberationLink: {deliberationLink}
+      contentUrl: {contentUrl}
     }
     DELETE g, r
-    CREATE (guide)-[:GUIDES]->(reality)
-    FOREACH (doThis IN CASE WHEN realizer IS NOT NULL THEN [1] ELSE [] END |
-      CREATE (realizer)-[:REALIZES]->(reality))
-    RETURN reality
+    CREATE (owner)-[:OWNS]->(graphTag)
+
+    RETURN graphTag
   `;
   return runQueryAndGetRecord(driver.session(), query, args);
 }
@@ -289,13 +263,13 @@ export function removeInterrelation(driver, { from, to }) {
   return runQueryAndGetRecordWithFields(driver.session(), query, queryParams);
 }
 
-export function removeDeliberation(driver, { from, to }) {
+export function removeContentLink(driver, { from, to }) {
   const queryParams = {
     fromId: from.nodeId,
     toUrl: to.url,
   };
   const query = `
-    MATCH (from {nodeId: {fromId}})-[r:HAS_DELIBERATION]->(to {url: {toUrl}})
+    MATCH (from {nodeId: {fromId}})-[r:IS_LINKED]->(to {url: {toUrl}})
     DELETE r
     RETURN from, to
   `;
@@ -313,7 +287,7 @@ export function searchPersons(driver, term) {
   return runQueryAndGetRecords(driver.session(), query, { term });
 }
 
-export function searchRealities(driver, label, term) {
+export function searchApp(driver, label, term) {
   const query = `
     MATCH (n:${label})
     WHERE toLower(n.title) CONTAINS toLower({term}) AND NOT EXISTS(n.deleted)
@@ -322,7 +296,7 @@ export function searchRealities(driver, label, term) {
   return runQueryAndGetRecords(driver.session(), query, { term });
 }
 
-export function getPeopleTwoStepsFromReality(driver, { nodeId }) {
+export function getPeopleTwoStepsFromApp(driver, { nodeId }) {
   const query = `
     MATCH (n {nodeId:'${nodeId}'})<-[*0..2]-(p:Person) 
     WITH collect(distinct p) as pe
@@ -335,15 +309,12 @@ export function getPeopleTwoStepsFromReality(driver, { nodeId }) {
 export function getEmailData(driver, { nodeId }) {
   const query = `
     MATCH (n {nodeId:'${nodeId}'})
-    MATCH (n)<-[:GUIDES*0..1]-(gu:Person)
-    OPTIONAL MATCH (re:Person)-[:REALIZES*0..1]->(n)
-    OPTIONAL MATCH (n)-[:FULFILLS]->(tag)
+    MATCH (n)<-[:OWNS*0..1]-(gu:Person)
     RETURN 
-    labels(n) as reality_labels,
+    labels(n) as graphTag_labels,
     n.description as description, 
     n.title as title, 
-    gu.email as guideEmail,
-    re.email as realizerEmail,
+    gu.email as ownerEmail,
     tag.nodeId as linkedTagId
   `;
   return runQueryAndGetRawData(driver.session(), query, { nodeId });

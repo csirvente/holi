@@ -90,17 +90,17 @@ mixin ie-close(props)
 mixin header
   tr
     td(style="padding: 15px 20px")
-      a(href="https://realities.theborderland.se/")
-        img(src="https://raw.githubusercontent.com/Edgeryders-Participio/participio-graphics/master/realities_logo_capitalized.png" alt="Realities Update" width="400" style="border-style: none; outline: none")
+      a(href="https://holi.app/")
+        img(src="https://scontent-cdt1-1.xx.fbcdn.net/v/t1.0-9/48077758_2213883658899175_8576356327771602944_n.png?_nc_cat=109&_nc_ht=scontent-cdt1-1.xx&oh=7188f2c3435a188b1ab5a8c263d07547&oe=5D318548" alt="Holi Update" width="400" style="border-style: none; outline: none")
         
 //- Super Heading
 //--------------------------------
-mixin super-heading(realityName, userEmail)
+mixin super-heading(holiName, userEmail)
   tr
     td(style="font-size: 0; background-color: #ef9322; text-align: center; padding: 16px 0")
       +ie-open(({cell: 300}))
       div(style="display: inline-block;")
-        table(cellspacing="0" cellpadding="0" border="0" width="300"): tr: td(class="u-textFallback" style="text-align: left; font-size: 19px; color: white; padding: 7px 20px; font-family: Montserrat, Arial, sans-serif; line-height: 1.4") Your reality<br> <b>#{realityName}</b><br>has been updated
+        table(cellspacing="0" cellpadding="0" border="0" width="300"): tr: td(class="u-textFallback" style="text-align: left; font-size: 19px; color: white; padding: 7px 20px; font-family: Montserrat, Arial, sans-serif; line-height: 1.4") Your holi<br> <b>#{holiName}</b><br>has been updated
       +ie-col(({cell: 300}))
       div(style="display: inline-block;")
         table(cellspacing="0" cellpadding="0" border="0" width="300"): tr: td(class="u-textFallback" style="text-align: right; font-size: 14px; color: white; padding: 7px 20px; font-family: Montserrat, Arial, sans-serif; line-height: 1.7") <br>Who made the change: <br> #{userEmail}
@@ -114,9 +114,9 @@ mixin intro-block
     td(style="font-size: 0; background-color: white; text-align: center; padding: 15px 0 35px")
       +ie-open(({cell: 600}))
       div(style="display: inline-block; vertical-align: top")
-        table(cellspacing="0" cellpadding="0" border="0" width="600"): tr: td(class="u-textFallback" style="line-height: 1.4; text-align: left; font-size: 15px; color: #666666; padding: 15px 20px; font-family: Montserrat, Arial, sans-serif") <p>There has been a shift in the fabric of Realities, and something has changed for a Tag or Responsibility you are linked to. When this change was made, the person making it thought that it was important enough to let you know. So what monkey did they let out of the bag this time? See more details below about what has changed.</p>
-      a(href=realityUrl)
-        img(src="https://raw.githubusercontent.com/Edgeryders-Participio/participio-graphics/master/takemetoreality.png" alt="Take me to Reality!" width="400")
+        table(cellspacing="0" cellpadding="0" border="0" width="600"): tr: td(class="u-textFallback" style="line-height: 1.4; text-align: left; font-size: 15px; color: #666666; padding: 15px 20px; font-family: Montserrat, Arial, sans-serif") <p>There has been a shift in the fabric of Holi, and something has changed for a Tag you are linked to. When this change was made, the person making it thought that it was important enough to let you know. So what monkey did they let out of the bag this time? See more details below about what has changed.</p>
+      a(href=holiUrl)
+        img(src="https://scontent-cdt1-1.xx.fbcdn.net/v/t1.0-9/48077758_2213883658899175_8576356327771602944_n.png?_nc_cat=109&_nc_ht=scontent-cdt1-1.xx&oh=7188f2c3435a188b1ab5a8c263d07547&oe=5D318548" alt="Take me to Holi!" width="400")
 
 
 //- Item Order
@@ -141,9 +141,9 @@ mixin thank-you
   tr
     td(style="border-top: 1px solid #CCCCCC; background-color: #EDEDED; padding: 30px 20px;")
       table(cellspacing="0" cellpadding="0" border="0" width="100%")
-        tr: td(class="u-textFallback" style="font-family: Montserrat, Arial, sans-serif; color: #666666; font-size: 14px; line-height: 1.5; text-align: center; ") What is it that separates dream from reality?  
+        tr: td(class="u-textFallback" style="font-family: Montserrat, Arial, sans-serif; color: #666666; font-size: 14px; line-height: 1.5; text-align: center; ") What is it knowledge management and news watch?  
         tr: td(class="u-textFallback" style="font-family: Montserrat, Arial, sans-serif; color: #666666; font-size: 14px; line-height: 1.5; text-align: center; ") Can you define the thin line that split the two? 
-        tr: td(class="u-textFallback" style="font-family: Montserrat, Arial, sans-serif; color: #666666; font-size: 14px; line-height: 1.5; text-align: center; ") What does that border consist of? 
+        tr: td(class="u-textFallback" style="font-family: Montserrat, Arial, sans-serif; color: #666666; font-size: 14px; line-height: 1.5; text-align: center; ") What does that consist of? 
 
 
 
@@ -180,16 +180,14 @@ html
           //--------------------------------
           tr: td
             table(cellspacing="0" cellpadding="0" border="0" width="100%" style="border: 1px solid #CCCCCC")
-              +super-heading(realityName, userEmail)
+              +super-heading(holiName, userEmail)
               +intro-block
               if title
                 +item-order('Title', title.old, title.new)
               if description
                 +item-order('Description', description.old, description.new)
-              if guide
-                +item-order('Guide', guide.old, guide.new)
-              if realizer
-                +item-order('Realizer', realizer.old, realizer.new)
+              if owner
+                +item-order('Owner', owner.old, owner.new)
               +thank-you
             
           //- Spacing Cell

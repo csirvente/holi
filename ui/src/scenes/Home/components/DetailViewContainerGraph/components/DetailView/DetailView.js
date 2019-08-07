@@ -18,17 +18,12 @@ DetailView.propTypes = {
     nodeId: PropTypes.string,
     title: PropTypes.string,
     description: PropTypes.string,
-    deliberations: PropTypes.arrayOf(PropTypes.shape({
+    contentLinks: PropTypes.arrayOf(PropTypes.shape({
       __typename: PropTypes.string,
       nodeId: PropTypes.string,
       title: PropTypes.string,
     })),
-    guide: PropTypes.shape({
-      nodeId: PropTypes.string,
-      email: PropTypes.string,
-      name: PropTypes.string,
-    }),
-    realizer: PropTypes.shape({
+    owner: PropTypes.shape({
       nodeId: PropTypes.string,
       email: PropTypes.string,
       name: PropTypes.string,
@@ -37,14 +32,6 @@ DetailView.propTypes = {
       __typename: PropTypes.string,
       nodeId: PropTypes.string,
       title: PropTypes.string,
-    })),
-    relatesToResponsibilities: PropTypes.arrayOf(PropTypes.shape({
-      __typename: PropTypes.string,
-      nodeId: PropTypes.string,
-      title: PropTypes.string,
-      fulfills: PropTypes.shape({
-        nodeId: PropTypes.string,
-      }),
     })),
   }),
 
@@ -55,19 +42,13 @@ DetailView.defaultProps = {
     nodeId: '',
     title: '',
     description: '',
-    deliberations: [],
-    guide: {
-      nodeId: '',
-      email: '',
-      name: '',
-    },
-    realizer: {
+    contentLinks: [],
+    owner: {
       nodeId: '',
       email: '',
       name: '',
     },
     relatesToTags: [],
-    relatesToResponsibilities: [],
   },
 
 };

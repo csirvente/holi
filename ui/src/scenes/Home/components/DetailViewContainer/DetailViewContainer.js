@@ -13,18 +13,13 @@ const createDetailViewQuery = nodeType => gql`
       nodeId
       title
       description
-      deliberationLink
-      guide {
+      contentUrl
+      owner {
         nodeId
         email
         name
       }
-      realizer {
-        nodeId
-        email
-        name
-      }
-      deliberations {
+      contentLinks {
         nodeId
         title
         url
@@ -33,13 +28,6 @@ const createDetailViewQuery = nodeType => gql`
         nodeId
         title
       }
-      relatesToResponsibilities {
-        nodeId
-        title
-        fulfills {
-          nodeId
-        }
-      }
     }
     showDetailedEditView @client
   }
@@ -47,20 +35,14 @@ const createDetailViewQuery = nodeType => gql`
 
 
 const GET_TAG = createDetailViewQuery('tag');
-const GET_RESPONSIBILITY = createDetailViewQuery('responsibility');
 
 const DetailViewContainer = withAuth(withRouter(({ auth, match }) => {
-  if (!match.params.tagId && !match.params.responsibilityId) return null;
+  if (!match.params.tagId) return null;
 
-  const queryProps = !match.params.responsibilityId ? {
+  const queryProps = {
     query: GET_TAG,
     variables: {
       nodeId: match.params.tagId,
-    },
-  } : {
-    query: GET_RESPONSIBILITY,
-    variables: {
-      nodeId: match.params.responsibilityId,
     },
   };
 
@@ -74,7 +56,7 @@ const DetailViewContainer = withAuth(withRouter(({ auth, match }) => {
       }) => {
         if (loading) return <WrappedLoader />;
         if (error) return `Error! ${error.message}`;
-        const node = !match.params.responsibilityId ? data.tag : data.responsibility;
+        const node = data.tag;
         if (!node) return null;
         return (
           <DetailView
@@ -109,7 +91,6 @@ DetailViewContainer.defaultProps = {
   match: {
     params: {
       tagId: undefined,
-      responsibilityId: undefined,
     },
   },
 };

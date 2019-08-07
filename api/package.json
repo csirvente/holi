@@ -1,10 +1,10 @@
 {
-  "name": "realities-api",
+  "name": "holi-api",
   "version": "0.0.2",
-  "description": "A backend for tribal decentralised organisations.",
+  "description": "A backend of a knowledge management app.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/theborderland/realities.git"
+    "url": "https://github.com/csirvente/holi.git"
   },
   "license": "GPL-3.0",
   "engines": {

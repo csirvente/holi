@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { CardBody, CardText, CardTitle } from 'reactstrap'; // Card
 import Interrelations from '@/components/Interrelations';
-import RealizersMissingIcon from '@/components/RealizersMissingIcon';
-import Deliberations from '@/components/Deliberations';
+import ContentLinks from '@/components/ContentLinks';
 // import LocalGraph from '@/components/LocalGraph';
 
 const LabelSpan = styled.span`
@@ -22,19 +21,10 @@ const DetailViewBody = ({ node }) => (
 
     <CardText>
       <LabelSpan>Source:</LabelSpan>
-      {node.guide &&
-        (node.guide.name
-          ? `${node.guide.name} (${node.guide.email})`
-          : node.guide.email)}
-    </CardText>
-
-    <CardText>
-      <LabelSpan>Added by:</LabelSpan>
-      {node.realizer &&
-        (node.realizer.name
-          ? `${node.realizer.name} (${node.realizer.email})`
-          : node.realizer.email)}
-      {!node.realizer && <RealizersMissingIcon />}
+      {node.owner &&
+        (node.owner.name
+          ? `${node.owner.name} (${node.owner.email})`
+          : node.owner.email)}
     </CardText>
 
     <CardText>
@@ -43,11 +33,11 @@ const DetailViewBody = ({ node }) => (
     </CardText>
 
     <CardSection>
-      <LabelSpan>link:</LabelSpan>
-      <Deliberations
+      <LabelSpan>linked content:</LabelSpan>
+      <ContentLinks
         nodeType={node.__typename}
         nodeId={node.nodeId}
-        deliberations={[...(node.deliberations || [])]}
+        contentLinks={[...(node.contentLinks || [])]}
       />
     </CardSection>
 
@@ -58,7 +48,6 @@ const DetailViewBody = ({ node }) => (
         nodeId={node.nodeId}
         interrelations={[
           ...(node.relatesToTags || []),
-          ...(node.relatesToResponsibilities || []),
         ]}
       />
     </CardSection>
@@ -72,35 +61,16 @@ DetailViewBody.propTypes = {
     nodeId: PropTypes.string,
     title: PropTypes.string,
     description: PropTypes.string,
-    deliberationLink: PropTypes.string,
-    guide: PropTypes.shape({
+    contentUrl: PropTypes.string,
+    owner: PropTypes.shape({
       nodeId: PropTypes.string,
       email: PropTypes.string,
       name: PropTypes.string,
     }),
-    realizer: PropTypes.shape({
-      nodeId: PropTypes.string,
-      email: PropTypes.string,
-      name: PropTypes.string,
-    }),
-    hasDeliberations: PropTypes.arrayOf(PropTypes.shape({
-      __typename: PropTypes.string,
-      nodeId: PropTypes.string,
-      title: PropTypes.string,
-      url: PropTypes.string,
-    })),
     relatesToTags: PropTypes.arrayOf(PropTypes.shape({
       __typename: PropTypes.string,
       nodeId: PropTypes.string,
       title: PropTypes.string,
-    })),
-    relatesToResponsibilities: PropTypes.arrayOf(PropTypes.shape({
-      __typename: PropTypes.string,
-      nodeId: PropTypes.string,
-      title: PropTypes.string,
-      fulfills: PropTypes.shape({
-        nodeId: PropTypes.string,
-      }),
     })),
   }),
 };
@@ -110,20 +80,13 @@ DetailViewBody.defaultProps = {
     nodeId: '',
     title: '',
     description: '',
-    deliberationLink: '',
-    guide: {
+    contentUrl: '',
+    owner: {
       nodeId: '',
       email: '',
       name: '',
     },
-    realizer: {
-      nodeId: '',
-      email: '',
-      name: '',
-    },
-    hasDeliberations: [],
     relatesToTags: [],
-    relatesToResponsibilities: [],
   },
 };
 

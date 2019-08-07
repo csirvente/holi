@@ -10,29 +10,22 @@ const createEditDetailsMutation = nodeType => gql`
   mutation EditDetailsContainer_update${nodeType}(
     $nodeId: ID!
     $title: String!
-    $guideEmail: String!
-    $realizerEmail: String
+    $ownerEmail: String!
     $description: String
-    $deliberationLink: String
+    $contentUrl: String
   ) {
     update${nodeType}(
       nodeId: $nodeId
       title: $title
-      guideEmail: $guideEmail
-      realizerEmail: $realizerEmail
+      ownerEmail: $ownerEmail
       description: $description
-      deliberationLink: $deliberationLink
+      contentUrl: $contentUrl
     ) {
       nodeId
       title
       description
-      deliberationLink
-      guide {
-        nodeId
-        email
-        name
-      }
-      realizer {
+      contentUrl
+      owner {
         nodeId
         email
         name
@@ -47,32 +40,27 @@ const EditDetailsContainer = ({ node }) => (
       <Formik
         initialValues={{
           title: node.title || '',
-          guide: node.guide || null,
-          realizer: node.realizer || null,
+          owner: node.owner || null,
           description: node.description || '',
-          deliberationLink: node.deliberationLink || '',
+          contentUrl: node.contentUrl || '',
         }}
         enableReinitialize
         validationSchema={yup.object().shape({
           title: yup.string().required('Title is required'),
-          guide: yup.object().shape({
+          owner: yup.object().shape({
             email: yup.string().required(),
-          }).typeError('Guide is required').required(),
-          realizer: yup.object().shape({
-            email: yup.string(),
-          }).nullable(),
+          }).typeError('Owner is required').required(),
           description: yup.string().nullable(),
-          deliberationLink: yup.string().nullable(),
+          contentUrl: yup.string().nullable(),
         })}
         onSubmit={(values, { resetForm }) => {
           updateNode({
             variables: {
               nodeId: node.nodeId,
               title: values.title,
-              guideEmail: values.guide && values.guide.email,
-              realizerEmail: values.realizer && values.realizer.email,
+              ownerEmail: values.owner && values.owner.email,
               description: values.description,
-              deliberationLink: values.deliberationLink,
+              contentUrl: values.contentUrl,
             },
           }).then(() => {
             resetForm();
@@ -113,13 +101,8 @@ EditDetailsContainer.propTypes = {
     nodeId: PropTypes.string,
     title: PropTypes.string,
     description: PropTypes.string,
-    deliberationLink: PropTypes.string,
-    guide: PropTypes.shape({
-      nodeId: PropTypes.string,
-      email: PropTypes.string,
-      name: PropTypes.string,
-    }),
-    realizer: PropTypes.shape({
+    contentUrl: PropTypes.string,
+    owner: PropTypes.shape({
       nodeId: PropTypes.string,
       email: PropTypes.string,
       name: PropTypes.string,
@@ -129,14 +112,6 @@ EditDetailsContainer.propTypes = {
       nodeId: PropTypes.string,
       title: PropTypes.string,
     })),
-    relatesToResponsibilities: PropTypes.arrayOf(PropTypes.shape({
-      __typename: PropTypes.string,
-      nodeId: PropTypes.string,
-      title: PropTypes.string,
-      fulfills: PropTypes.shape({
-        nodeId: PropTypes.string,
-      }),
-    })),
   }),
 };
 
@@ -145,19 +120,13 @@ EditDetailsContainer.defaultProps = {
     nodeId: '',
     title: '',
     description: '',
-    deliberationLink: '',
-    guide: {
-      nodeId: '',
-      email: '',
-      name: '',
-    },
-    realizer: {
+    contentUrl: '',
+    owner: {
       nodeId: '',
       email: '',
       name: '',
     },
     relatesToTags: [],
-    relatesToResponsibilities: [],
   },
 };
 

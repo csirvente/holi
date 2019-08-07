@@ -30,9 +30,7 @@ SearchResults.propTypes = {
     __typename: PropTypes.string,
     nodeId: PropTypes.string,
     title: PropTypes.string,
-    fulfills: PropTypes.shape({
-      nodeId: PropTypes.string,
-    }),
+
   })),
   getMenuProps: PropTypes.func,
   getItemProps: PropTypes.func,

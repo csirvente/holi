@@ -7,40 +7,14 @@ export const GET_TAGS = gql`
     tags {
       nodeId
       title
-      fulfilledBy {
-        nodeId
-        title
-        realizer {
-          nodeId
-          name
-        }
-      }
     }
   }
 `;
 
-export const GET_RESPONSIBILITIES = gql`
-  query Responsibilities($tagId: ID!) {
-    responsibilities(fulfillsTagId: $tagId) {
+export const GET_GRAPHTAG_CONTENTS = gql`
+  query GraphTagContents($graphTagId: ID!) {
+    graphTag(nodeId: $graphTagId) {
       nodeId
-      title
-      realizer {
-        nodeId
-        name
-      }
-    }
-  }
-`;
-
-export const GET_REALITY_INFOS = gql`
-  query RealityInfos($realityId: ID!) {
-    reality(nodeId: $realityId) {
-      nodeId
-      fulfilledBy {
-        nodeId
-        title
-        url
-      }
     }
   }
 `;

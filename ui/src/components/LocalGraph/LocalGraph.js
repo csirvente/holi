@@ -13,12 +13,7 @@ const TAG_FRAGMENT = gql`
     nodeId
     title
     description
-    guide {
-      nodeId
-      email
-      name
-    }
-    realizer {
+    owner {
       nodeId
       email
       name
@@ -26,21 +21,11 @@ const TAG_FRAGMENT = gql`
   }
 `;
 
-const RESPONSIBILITY_FRAGMENT = gql`
-  fragment LocalGraphResponsibilityFields on Responsibility {
+const CONTENT_LINK_FRAGMENT = gql`
+  fragment LocalGraphContentLinkFields on Content {
     nodeId
     title
-    description
-    guide {
-      nodeId
-      email
-      name
-    }
-    realizer {
-      nodeId
-      email
-      name
-    }
+    url
   }
 `;
 
@@ -48,133 +33,65 @@ const GET_TAG = gql`
   query LocalGraph_tag($nodeId: ID!) {
     tag(nodeId: $nodeId) {
       ...LocalGraphTagFields
-      fulfilledBy {
-        ...LocalGraphResponsibilityFields
-      }
+
       relatesToTags {
         ...LocalGraphTagFields
       }
-      relatesToResponsibilities {
-        ...LocalGraphResponsibilityFields
-      }
+
       tagsThatRelateToThis {
         ...LocalGraphTagFields
       }
-      responsibilitiesThatRelateToThis {
-        ...LocalGraphResponsibilityFields
+
+      contentLinks {
+        ...LocalGraphContentLinkFields
       }
     }
   }
   ${TAG_FRAGMENT}
-  ${RESPONSIBILITY_FRAGMENT}
+  ${CONTENT_LINK_FRAGMENT}
 `;
 
-const GET_RESPONSIBILITY = gql`
-  query LocalGraph_responsibility($nodeId: ID!) {
-    responsibility(nodeId: $nodeId) {
-      ...LocalGraphResponsibilityFields
-      fulfills {
+const GET_CONTENT_LINK = gql`
+  query LocalGraph_contentLink($nodeId: ID!) {
+    contentLink(nodeId: $nodeId) {
+      ...LocalGraphContentLinkFields
+      isLinked {
         ...LocalGraphTagFields
       }
       relatesToTags {
         ...LocalGraphTagFields
       }
-      relatesToResponsibilities {
-        ...LocalGraphResponsibilityFields
-      }
       tagsThatRelateToThis {
         ...LocalGraphTagFields
-      }
-      responsibilitiesThatRelateToThis {
-        ...LocalGraphResponsibilityFields
       }
     }
   }
   ${TAG_FRAGMENT}
-  ${RESPONSIBILITY_FRAGMENT}
+  ${CONTENT_LINK_FRAGMENT}
 `;
 
 const TAG_ON_PERSON_FRAGMENT = gql`
   fragment TagOnPerson on Tag {
     nodeId
     title
-    guide {
+    owner {
       nodeId
       name
-    }
-    realizer {
-      nodeId
-      name
-    }
-    fulfilledBy {
-      nodeId
-      title
-      guide {
-        nodeId
-        name
-      }
-      realizer {
-        nodeId
-        name
-      }
     }
   }
 `;
-const RESPONSIBILITY_ON_PERSON_FRAGMENT = gql`
-  fragment ResponsibilityOnPerson on Responsibility {
-    nodeId
-    title
-    relatesToResponsibilities {
-      nodeId
-      title
-      guide {
-        nodeId
-        name
-      }
-    }
-    guide {
-      nodeId
-      name
-    }
-    realizer {
-      nodeId
-      name
-    }
-    fulfills {
-      nodeId
-      title
-      guide {
-        nodeId
-        name
-      }
-      realizer {
-        nodeId
-        name
-      }
-    }
-  }
-`;
+
 const GET_PERSON = gql`
   query LocalGraphPersonFields($nodeId: ID!) {
     person(nodeId: $nodeId) {
       nodeId
       name
-      guidesTags {
+      ownsTags {
         ...TagOnPerson
-      }
-      realizesTags {
-        ...TagOnPerson
-      }
-      guidesResponsibilities {
-        ...ResponsibilityOnPerson
-      }
-      realizesResponsibilities {
-        ...ResponsibilityOnPerson
       }
     }
   }
   ${TAG_ON_PERSON_FRAGMENT}
-  ${RESPONSIBILITY_ON_PERSON_FRAGMENT}
 `;
 
 const graphOptions = {
@@ -238,8 +155,8 @@ class LocalGraph extends Component {
     let gqlQuery;
     if (nodeType === 'Tag') {
       gqlQuery = GET_TAG;
-    } else if (nodeType === 'Responsibility') {
-      gqlQuery = GET_RESPONSIBILITY;
+    } else if (nodeType === 'ContentLink') {
+      gqlQuery = GET_CONTENT_LINK;
     } else {
       gqlQuery = GET_PERSON;
     }
@@ -254,11 +171,11 @@ class LocalGraph extends Component {
           // The next line is a temporary hack to make up for a bug in Apollo where
           // the query returns an empty data object sometimes:
           // https://github.com/apollographql/apollo-client/issues/3267
-          if (!data.tag && !data.responsibility && !data.person) refetch();
+          if (!data.tag && !data.links && !data.person) refetch();
 
           let node;
           if (nodeType === 'Tag') node = data.tag;
-          else if (nodeType === 'Responsibility') node = data.responsibility;
+          else if (nodeType === 'ContentLink') node = data.contentLink;
           else node = data.person;
 
           if (!node) return null;
@@ -273,7 +190,7 @@ class LocalGraph extends Component {
                   events={{
                     select: event => this.onSelectNode(event, graphData),
                   }}
-                  style={{ height: '40em' }}
+                  style={{ height: '25em' }}
                 />
               </div>
               <Popover

@@ -1,6 +1,6 @@
-# Realities Front-end
+# Holi Front-end
 
-The Realities front-end is a single-page React app. It fetches data from the back-end via a GraphQL API. 
+The Holi front-end is a single-page React app. It fetches data from the back-end via a GraphQL API. 
 
 ## How to contribute
 
@@ -50,7 +50,7 @@ A very common pattern is to wrap a presentational component with a container com
 
 [Flux](https://scotch.io/tutorials/getting-to-know-flux-the-react-js-architecture) is another pattern that helps keep React apps sane when you need to manage state across many components. Simply put, it states that data only ever flows down (from parent containers to child containers). It never flows up (from children to parents). If you have child components that need to inform parent components of some sort of change, it should dispatch a mutation to a central state store (in our case that's [Apollo Client's](https://www.apollographql.com/docs/react/) cache). The parent container can then subscribe to changes to the specific part of the overall state that concerns it, and update when needed.
 
-We manage all this with Apollo Client and [React Router](https://reacttraining.com/react-router/web/guides/quick-start). Some of the app's state is held in the database itself, such as Tag and Responsibility properties (changes to that state is made through Apollo Mutations). Some state is only held in the front-end, such as whether the 'new tag' form is visible or hidden (we use [Apollo's local state](https://www.apollographql.com/docs/react/essentials/local-state.html)). Finally, some state is held in the URL, such as which Tag or Responsibility is currently selected (we use React Router for that).
+We manage all this with Apollo Client and [React Router](https://reacttraining.com/react-router/web/guides/quick-start). Some of the app's state is held in the database itself, such as Tag properties (changes to that state is made through Apollo Mutations). Some state is only held in the front-end, such as whether the 'new tag' form is visible or hidden (we use [Apollo's local state](https://www.apollographql.com/docs/react/essentials/local-state.html)). Finally, some state is held in the URL, such as which Tag is currently selected (we use React Router for that).
 
 [Read more about Flux...](https://scotch.io/tutorials/getting-to-know-flux-the-react-js-architecture)
 
@@ -80,13 +80,13 @@ When manually updating the cache, you sometimes need to import the GraphQL query
 
 ### Authentication with Auth0
 
-We use [Auth0](https://auth0.com/) for authentication. When a user logs in or signs up, they are taken through a flow where Auth0 generates a [JWT](https://jwt.io/) and redirects to http://realities.theborder.and.se/auth-callback, where we get the JWT and store it in localStorage. The `AuthRoutesContainer` component handles routing for the /auth-callback route and renders the `AuthCallback` component, which in turn uses the `auth` service (under `/ui/src/services/`) to get and store the JWT.
+We use [Auth0](https://auth0.com/) for authentication. When a user logs in or signs up, they are taken through a flow where Auth0 generates a [JWT](https://jwt.io/) and redirects to http://holi.app/auth-callback, where we get the JWT and store it in localStorage. The `AuthRoutesContainer` component handles routing for the /auth-callback route and renders the `AuthCallback` component, which in turn uses the `auth` service (under `/ui/src/services/`) to get and store the JWT.
 
 We have a [Higher Order Component (HOC)](https://reactjs.org/docs/higher-order-components.html) named `withAuth` that can be used to provide components with props related to authentication. It provides a `login` and `logout` function, an `isLoggedIn` flag and the user's `email`. 
 
 ### CSS and Styling
 
-Styles in Realities can come from two places. First of all, we import [Bootstrap v4's](https://getbootstrap.com/docs/4.1/getting-started/introduction/) stylesheets, which are applied globally. We use Bootstrap components via [reactstrap](http://reactstrap.github.io/). For custom styles we use [styled-components](https://www.styled-components.com/). Styled components are allowed to be defined in the file for the component in which they will be used, but can also be defined as their own shared component under `/ui/src/components/` if they will be used in several places in the app. 
+Styles in Holi can come from two places. First of all, we import [Bootstrap v4's](https://getbootstrap.com/docs/4.1/getting-started/introduction/) stylesheets, which are applied globally. We use Bootstrap components via [reactstrap](http://reactstrap.github.io/). For custom styles we use [styled-components](https://www.styled-components.com/). Styled components are allowed to be defined in the file for the component in which they will be used, but can also be defined as their own shared component under `/ui/src/components/` if they will be used in several places in the app. 
 
 These are the only two ways we apply styles in the app. We don't write our own globally applied stylesheets and we keep customizing Bootstrap's global styles to a bare minimum (if at all).
 

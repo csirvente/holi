@@ -1,7 +1,7 @@
 {
-  "name": "realities-ui",
+  "name": "holi-ui",
   "version": "0.1.0",
-  "description": "A frontend for tribal decentralised organisations.",
+  "description": "A frontend for a knowledge management app.",
   "engines": {
     "npm": "5.5.1",
     "node": "8.9.1"
