@@ -1,3 +1,4 @@
+
 import path from 'path';
 import express from 'express';
 import cors from 'cors';
@@ -44,8 +45,8 @@ function getUser(user) {
     {},
     user,
     {
-      email: user['https://holi.app/email'],
-      role: user['https://holi.app/role'],
+      email: user['https://holiapp.herokuapp.com/email'],
+      role: user['https://holiapp.herokuapp.com/role'],
     },
   );
 }
