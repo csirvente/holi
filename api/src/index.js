@@ -45,8 +45,8 @@ function getUser(user) {
     {},
     user,
     {
-      email: user['https://holiapp.herokuapp.com/email'],
-      role: user['https://holiapp.herokuapp.com/role'],
+      email: user['https://holi.app/email'],
+      role: user['https://holi.app/role'],
     },
   );
 }
