@@ -24,6 +24,6 @@
   "dependencies": {
     "babel-eslint": "^8.0.3",
     "concurrently": "^3.5.1",
-    "normalize-url": "^4.0.0"
+    "normalize-url": "^4.5.1"
   }
 }
